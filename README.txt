@@ -1,1 +1,1 @@
-This project builds a model to correlate glucose concentration to detectable photoacoustic signal based to the change in rotation angle of incident light through chiral centers.
+This project builds a model to correlate glucose concentration to detectable photoacoustic signal based on the change in rotation angle of incident light through chiral centers.
