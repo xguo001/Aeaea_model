@@ -1,12 +1,14 @@
 import numpy as np
 import miepython
+import matplotlib.pyplot as plt
+import seaborn as sns
 from numba.np.arraymath import np_histogram
 
 # --- Constants ---
 MU_S = 10  # Scattering coefficient [1/cm]
 MU_A = 1   # Absorption coefficient [1/cm]
 G = 0.9    # Anisotropy
-ALPHA = 0.01  # Optical rotation per concentration unit [rad/(cm*mmol/L)]
+ALPHA = 0.1  # Optical rotation per concentration unit [rad/(cm*mmol/L)]
 GLUCOSE_CONC = 5.0  # mmol/L
 medium_index=1.33
 sphere_index=1.57
@@ -72,7 +74,7 @@ def sample_mie_direction(radius, wavelength, n_particle, n_medium, n_angles=2000
     return np.array([dx, dy, dz])
 
 
-def simulate_photon():
+def simulate_photon(GC):
     position = np.array([0.0, 0.0, 0.0])  # Start at origin
     direction = np.array([0.0, 0.0, 1.0])  # Initial direction
     weight = 1.0
@@ -81,14 +83,14 @@ def simulate_photon():
     mu_t = MU_S + MU_A
     path_length = 0.0
 
-    for _ in range(1000):
+    for _ in range(90):
         s = sample_step(mu_t)
         position += s * direction
         path_length += s
         direction = sample_mie_direction(radius, wavelength, n_particle=1.57, n_medium=1.33, n_angles=2000)
 
         # Optical rotation by glucose (alpha * concentration * path_length)
-        theta = ALPHA * GLUCOSE_CONC * s
+        theta = ALPHA * GC * s
         stokes = rotate_stokes_vector(stokes, theta)
 
         # Absorb a bit of energy
@@ -108,20 +110,70 @@ def simulate_multiple_photons(n_photons):
     """ Run the simulation for multiple photons and collect results """
     results = []
     for _ in range(n_photons):
-        result = simulate_photon()
+        result = simulate_photon(GC)
         results.append(result)
     return results
 
 
+def plot_direction_angles(results):
+    """ Plot a scatter plot of final photon direction angles (θ, φ) """
+    thetas = []
+    phis = []
 
+    for r in results:
+        dx, dy, dz = r["final_direction"]
+        theta = np.arccos(dz)            # θ ∈ [0, π]
+        phi = np.arctan2(dy, dx)         # φ ∈ [-π, π]
+        if phi < 0:
+            phi += 2 * np.pi             # φ ∈ [0, 2π]
+        thetas.append(theta)
+        phis.append(phi)
 
+    plt.figure(figsize=(6, 6))
+    plt.scatter(phis, thetas, alpha=0.6, s=10, edgecolor='k')
+    plt.xlabel("φ (Azimuthal Angle) [rad]")
+    plt.ylabel("θ (Polar Angle from z-axis) [rad]")
+    plt.title("Final Photon Direction Angles (θ vs. φ)")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+def plot_rotation_angles(results):
+    """ Plot histogram of total optical rotation angle (θ = α * C * path_length) """
+    rotation_angles = [
+        ALPHA * GLUCOSE_CONC * r["total_path_length"]
+        for r in results
+    ]
+    angle=sum(rotation_angles)/len(results)
+    print (sum(rotation_angles)/len(results))
+    plt.figure(figsize=(6, 4))
+    sns.histplot(rotation_angles, bins=20, kde=True, color='teal')
+    plt.xlabel("Total Optical Rotation Angle θ [rad]")
+    plt.ylabel("Photon Count")
+    plt.title("Distribution of Optical Rotation Angles")
+    plt.grid(True)
+    plt.xlim([3,6])
+    plt.ylim([0,500])
+    plt.tight_layout()
+    plt.show()
+    return angle
 # --- Run Simulation ---
 if __name__ == "__main__":
-    n_photons = 10
-    results = simulate_multiple_photons(n_photons)
-
-    for i, result in enumerate(results):
-        print(f"\nPhoton {i + 1}:")
+    n_photons = 800
+    GC_a=[2,6,10,14,18,22,26]
+    A=[]
+    for GC in GC_a:
+        results = simulate_multiple_photons(n_photons)
+        for i, result in enumerate(results):
+            print(f"\nPhoton {i + 1}:")
         for key, value in result.items():
             print(f"  {key}: {value}")
-
+        angle=plot_rotation_angles(results)
+        A.append(angle)
+        print("Rotation angle:"+str(angle))
+        print("Glucose concentration:" +str(GC))
+    plt.plot(GC_a,A)
+    plt.xlabel("Glucose concentration")
+    plt.ylabel("Rotation Angle")
+    plt.title("GC vs. Angle")
+    plt.show()
+    print(A)
