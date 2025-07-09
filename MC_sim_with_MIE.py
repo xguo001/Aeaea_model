@@ -7,7 +7,37 @@ def initialize_photon():
     position = np.array([0.0, 0.0, 0.0])
     direction = np.array([0.0, 0.0, 1.0])
     stokes = np.array([1.0, 1.0, 0.0, 0.0])  # linearly polarized along x
-    return position, direction, stokes
+    energy = 1
+    return position, direction, stokes, energy
+
+
+
+# -----------------------------
+# ENERGY DECAY
+# -----------------------------
+def energy_decay(energy,mu_t,r):
+    energy= energy*np.exp(-mu_t*r)
+    return energy
+
+
+def compute_phi(d_in, d_out):
+    """
+    Compute azimuthal rotation angle phi between incoming and outgoing photon directions.
+    """
+    n_ref = np.array([0.0, 1.0, 0.0])  # y-axis as reference normal
+    n_scat = np.cross(d_in, d_out)
+    norm_ref = np.linalg.norm(n_ref)
+    norm_scat = np.linalg.norm(n_scat)
+
+    if norm_scat == 0:
+        return 0.0
+
+    dot = np.dot(n_ref, n_scat)
+    cross = np.linalg.norm(np.cross(n_ref, n_scat))
+    phi = np.arctan2(cross, dot)
+    return phi
+
+
 
 # -----------------------------
 # ROTATION MATRIX AROUND Z (Eq. 3)
@@ -34,8 +64,8 @@ def rotation_matrix_glucose(theta):
 # -----------------------------
 # MIE SCATTERING MATRIX (Eq. 1 with elements from Eq. 2)
 # -----------------------------
-def mie_scattering_matrix_rayleigh(theta):
-    cos_theta = np.cos(theta)
+def mie_scattering_matrix_rayleigh(theta_s):
+    cos_theta = np.cos(theta_s)
     cos2_theta = cos_theta ** 2
 
     a = (3 / (16 * np.pi)) * (1 + cos2_theta)
@@ -75,7 +105,7 @@ def define_material():
         "g": 0.9,
         "n": 1.37,
         "alpha": 1.0e-5,
-        "glucose_conc": 80.0,
+        "glucose_conc": 180.0,
         "thickness": 0.04,
     }
 
@@ -96,14 +126,14 @@ def simulate_one_photon():
     theta_glucose = material["alpha"] * material["glucose_conc"] * s
     D = rotation_matrix_glucose(theta_glucose)
 
-    # Step 2: Set phi (scattering azimuth)
-    phi = 0.0  # or randomly sampled
+    # Step 2: Set phi
+    phi =0.0  #randomly sampled
     R_phi = rotation_matrix_phi(phi)
-    R_neg_phi = rotation_matrix_phi(-phi)
+
 
     # Step 3: Apply Eq. 5: R(-phi) * D * R(phi)
-    M = R_neg_phi @ D @ R_phi
-    stokes = M @ stokes
+    ##M = R_phi @ D @ R_phi
+    ##stokes = M @ stokes
 
     # Step 4: Apply Rayleigh scattering matrix using Eq. 1 and 2
     scattering_angle = np.pi / 4  # example scattering angle (45 deg)
@@ -114,3 +144,10 @@ def simulate_one_photon():
         return stokes
     else:
         return None
+if __name__ == "__main__":
+    n_photons = 1
+    GC_a=[2,6,10,18,26]
+    A=[]
+    photon=simulate_one_photon()
+    print(photon)
+    print([ 5.96831037e-02 ,5.96831036e-02 -1.29437377e-06 , 0.00000000e+00])
