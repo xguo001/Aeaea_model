@@ -95,6 +95,16 @@ def detect_photon(photon_position, detector):
     theta = np.arctan2(radial_distance, abs(dz))
     return theta < detector["acceptance_angle"]
 
+
+def change_direction(g):
+    """ Sample scattering direction using Henyey-Greenstein phase function """
+    cos_theta = (1 / (2 * g)) * (1 + g ** 2 - ((1 - g ** 2) / (1 - g + 2 * g * np.random.rand())) ** 2)
+    sin_theta = np.sqrt(1 - cos_theta ** 2)
+    phi = 2 * np.pi * np.random.rand()
+    dx = sin_theta * np.cos(phi)
+    dy = sin_theta * np.sin(phi)
+    dz = cos_theta
+    return np.array([dx, dy, dz])
 # -----------------------------
 # MATERIAL PARAMETERS
 # -----------------------------
@@ -115,16 +125,33 @@ def define_material():
 def simulate_one_photon():
     material = define_material()
     detector = setup_detector()
-
-    pos, dir, stokes = initialize_photon()
+    pos, dir, stokes, energy = initialize_photon()
     mu_t = material["mu_s"] + material["mu_a"]
-    s = -np.log(np.random.rand()) / mu_t
+    total_path_length = 0
+    alive=True
+    while alive:
+        # Travel step
+        s = -np.log(np.random.rand()) / mu_t
+        total_path_length += s
+        pos += dir * s
+        # Energy decay
+        energy = energy_decay(energy,mu_t, s)
+        # Glucose rotation
+        theta_glucose = material["alpha"] * material["glucose_conc"] * s
+        D = rotation_matrix_glucose(theta_glucose)
+        stokes = D @ stokes
+        if energy <= 1e-4:
+            alive = False
+        if detect_photon(pos, detector):
+            return total_path_length, stokes
+        dir1= change_direction(g=0.7)
+        phi= compute_phi(dir, dir1)
 
-    pos += dir * s
 
-    # Step 1: Rotation due to glucose
-    theta_glucose = material["alpha"] * material["glucose_conc"] * s
-    D = rotation_matrix_glucose(theta_glucose)
+
+
+
+
 
     # Step 2: Set phi
     phi =0.0  #randomly sampled
@@ -149,5 +176,5 @@ if __name__ == "__main__":
     GC_a=[2,6,10,18,26]
     A=[]
     photon=simulate_one_photon()
-    print(photon)
-    print([ 5.96831037e-02 ,5.96831036e-02 -1.29437377e-06 , 0.00000000e+00])
+    print("total path length:", photon[0])
+    print("stokes:", photon[1])
