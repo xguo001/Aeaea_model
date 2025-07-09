@@ -144,8 +144,11 @@ def simulate_one_photon():
             alive = False
         if detect_photon(pos, detector):
             return total_path_length, stokes
-        dir1= change_direction(g=0.7)
+        dir1= change_direction(g=0.9)
         phi= compute_phi(dir, dir1)
+        M= mie_scattering_matrix_rayleigh(phi)
+        D= rotation_matrix_phi(phi) @ M @ rotation_matrix_phi(phi)
+        stokes = D @ stokes
 
 
 
