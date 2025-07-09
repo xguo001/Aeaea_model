@@ -193,7 +193,7 @@ def simulate_multiple_photon(GC, n_photons):
     results = []
 
     for _ in range(n_photons):
-        stokes, total_path_length = simulate_one_photon(GC)
+        total_path_length, stokes = simulate_one_photon(GC)
         results.append(rotation_angle_calculation(GC,total_path_length))
 
     return np.mean(results)
@@ -210,16 +210,16 @@ def simulate_one_gc(GC, n_photons):
 
     elapsed = (time.perf_counter() - start)/60
     print(f"[PID {pid}] processing GC = {GC} ended in {elapsed:.2f} minutes", flush=True)  # live announcement
-    print(f"GC = {GC}, Angle = {angle:.2f}")
+    print(f"GC = {GC}, Angle = {angle}")
     return angle
 
 # -----------------------------
 # RUN SIMULATION BASED ON NUMBER OF PHOTONS AND GLUCOSE LEVEL INPUTS, WRITE OUT TO A GRAPH
 # -----------------------------
 if __name__ == "__main__":
-    n_cores = 1
-    n_photons = 1
-    GC_a=[2,6,10,18,26]
+    n_cores = 2
+    n_photons = 1000
+    GC_a=[2,5,8,11,14,17,20,23,26]
     A=[]
 
     with ProcessPoolExecutor(max_workers=n_cores) as pool:
