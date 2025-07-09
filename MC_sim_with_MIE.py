@@ -1,4 +1,8 @@
 import numpy as np
+import matplotlib.pyplot as plt
+from concurrent.futures import ProcessPoolExecutor
+import os,time
+from itertools import repeat
 
 # -----------------------------
 # INITIALIZE PHOTON
@@ -108,7 +112,7 @@ def change_direction(g):
 # -----------------------------
 # MATERIAL PARAMETERS
 # -----------------------------
-def define_material():
+def define_material(GC):
     return {
         "mu_s": 100.0,
         "mu_a": 10.0,
@@ -122,8 +126,8 @@ def define_material():
 # -----------------------------
 # PHOTON PROPAGATION AND MATRIX OPERATIONS (Eq. 5)
 # -----------------------------
-def simulate_one_photon():
-    material = define_material()
+def simulate_one_photon(GC):
+    material = define_material(GC)
     detector = setup_detector()
     pos, dir, stokes, energy = initialize_photon()
     mu_t = material["mu_s"] + material["mu_a"]
@@ -174,10 +178,56 @@ def simulate_one_photon():
         return stokes
     else:
         return None
+    
+# -----------------------------
+# TAKE THE TOTAL PATH LENGTH FROM A PHOTON'S JOURNEY AND RETURN THE ROTATION ANGLE (EQ.1 OF CHICKEN FINGER PAPER)
+# -----------------------------
+def rotation_angle_calculation(GC,total_path_length):
+
+    return GC*total_path_length*define_material(GC)["alpha"]
+
+# -----------------------------
+# TAKE A GLUCOSE LEVEL AND SIMULATE N NUMBER OF PHOTONS AND RETURN THE MEAN
+# -----------------------------
+def simulate_multiple_photon(GC, n_photons):
+    results = []
+
+    for _ in range(n_photons):
+        stokes, total_path_length = simulate_one_photon(GC)
+        results.append(rotation_angle_calculation(GC,total_path_length))
+
+    return np.mean(results)
+
+# -----------------------------
+# WRAPPER AROUND SINGLE GLUCOSE LEVEL SIMUATION WITH MULTITHREADING AND ANGLE ROTATION PRINTOUT
+# -----------------------------
+def simulate_one_gc(GC, n_photons):
+    start = time.perf_counter()
+    pid = os.getpid()
+    print(f"[PID {pid}] processing GC = {GC} begins", flush=True)  # live announcement
+
+    angle = simulate_multiple_photon(GC, n_photons)
+
+    elapsed = (time.perf_counter() - start)/60
+    print(f"[PID {pid}] processing GC = {GC} ended in {elapsed:.2f} minutes", flush=True)  # live announcement
+    print(f"GC = {GC}, Angle = {angle:.2f}")
+    return angle
+
+# -----------------------------
+# RUN SIMULATION BASED ON NUMBER OF PHOTONS AND GLUCOSE LEVEL INPUTS, WRITE OUT TO A GRAPH
+# -----------------------------
 if __name__ == "__main__":
+    n_cores = 1
     n_photons = 1
     GC_a=[2,6,10,18,26]
     A=[]
-    photon=simulate_one_photon()
-    print("total path length:", photon[0])
-    print("stokes:", photon[1])
+
+    with ProcessPoolExecutor(max_workers=n_cores) as pool:
+        A = list(pool.map(simulate_one_gc, GC_a, repeat(n_photons)))
+
+    plt.plot(GC_a,A)
+    plt.xlabel("Glucose concentration")
+    plt.ylabel("Rotation Angle")
+    plt.title("GC vs. Angle")
+    plt.show()
+#    plt.savefig(r"/home/ubuntu/results/gc_angles.png",dpi=300)
