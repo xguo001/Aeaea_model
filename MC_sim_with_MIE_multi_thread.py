@@ -91,8 +91,8 @@ def setup_detector():
     # A detector is defined by an angle and the r
     return {
         "cone_axis": np.array([0.0, 0.0, 1]),
-        "alpha": np.pi / 4,
-        "r": .1
+        "alpha": np.pi / 8,
+        "r": 1
     }
 
 def detect_photon(photon_start, photon_end, cone_axis, alpha, R):
@@ -140,8 +140,8 @@ def detect_photon(photon_start, photon_end, cone_axis, alpha, R):
     for t in ts:
         if 0 <= t <= 1 :
             P = photon_start + t * d
-            cos_theta = np.dot(P, cone_axis) / R  # |P| == R
-            if cos_theta >= cos_alpha:
+            cos_theta = np.dot(P, cone_axis) / np.linalg.norm(P)  # |P| == R
+            if cos_theta >= cos_alpha - 1e-9:
                 return True
 
     return False
@@ -178,13 +178,14 @@ def simulate_one_photon(GC):
     material = define_material(GC)
     detector = setup_detector()
     pos, dir, stokes, energy = initialize_photon()
-    pos_start = pos
     mu_t = material["mu_s"] + material["mu_a"]
     total_path_length = 0
     alive = True
     step_counter = 0
 
     while alive:
+        pos_start = pos.copy()
+
         # Travel step
         s = -np.log(np.random.rand()) / mu_t
         total_path_length += s
@@ -201,18 +202,17 @@ def simulate_one_photon(GC):
 
         # Look to see if detected
         if detect_photon(pos_start,pos,detector["cone_axis"],detector["alpha"],detector["r"]):
-            print ("I'm detected")
+
             return alive, step_counter, total_path_length, stokes
 
         # Look to see if unalived
         if energy <= 1e-4:
             alive = False
 
-        pos_start = pos #we need to know both beginning and end of photon trajectory to detect; after detection, re-initialize end position to begin position
-
         # Scatter if undetected
         dir1= change_direction(g=0.9)
         phi= compute_phi(dir, dir1)
+        dir=dir1
         M= mie_scattering_matrix_rayleigh(phi)
         D= rotation_matrix_phi(phi) @ M @ rotation_matrix_phi(phi)
         stokes = D @ stokes
@@ -266,17 +266,25 @@ def simulate_one_gc(GC, n_photons):
 # RUN SIMULATION BASED ON NUMBER OF PHOTONS AND GLUCOSE LEVEL INPUTS, WRITE OUT TO A GRAPH
 # -----------------------------
 if __name__ == "__main__":
-    n_cores = 1
-    n_photons = 100
-    GC_a=[2]
-    A=[]
+   n_cores = 1
+   n_photons = 1000
+   GC_a=[2]
+   A=[]
 
-    with ProcessPoolExecutor(max_workers=n_cores) as pool:
-        A = list(pool.map(simulate_one_gc, GC_a, repeat(n_photons)))
+   with ProcessPoolExecutor(max_workers=n_cores) as pool:
+       A = list(pool.map(simulate_one_gc, GC_a, repeat(n_photons)))
 
-    plt.plot(GC_a,A)
-    plt.xlabel("Glucose concentration")
-    plt.ylabel("Rotation Angle")
-    plt.title("GC vs. Angle")
-    plt.show()
+   plt.plot(GC_a,A)
+   plt.xlabel("Glucose concentration")
+   plt.ylabel("Rotation Angle")
+   plt.title("GC vs. Angle")
+   plt.show()
 #    plt.savefig(r"/home/ubuntu/results/gc_angles.png",dpi=300)
+#
+#     photon_start = np.array([0, 0, 0])
+#     photon_end = np.array([0, 0, 0.45])
+#     cone_axis = np.array([0, 0, 1])
+#     alpha = np.pi
+#     R = 0.1
+#
+#     print("Detected:", detect_photon(photon_start, photon_end, cone_axis, alpha, R))
