@@ -14,15 +14,12 @@ def initialize_photon():
     energy = 1
     return position, direction, stokes, energy
 
-
-
 # -----------------------------
 # ENERGY DECAY
 # -----------------------------
 def energy_decay(energy,mu_t,r):
     energy= energy*np.exp(-mu_t*r)
     return energy
-
 
 def compute_phi(d_in, d_out):
     """
@@ -40,8 +37,6 @@ def compute_phi(d_in, d_out):
     cross = np.linalg.norm(np.cross(n_ref, n_scat))
     phi = np.arctan2(cross, dot)
     return phi
-
-
 
 # -----------------------------
 # ROTATION MATRIX AROUND Z (Eq. 3)
@@ -146,6 +141,45 @@ def detect_photon(photon_start, photon_end, cone_axis, alpha, R):
 
     return False
 
+def detect_boundary(photon_start, photon_end, R):
+    #!!!!!!! <- boundary currently set to have the same radius as where detector is located
+    """
+    Parameters
+    ----------
+    photon_start, photon_end : (3,) array-like
+        Cartesian coordinates of the segment's start and end.
+    R : float
+        Sphere radius.
+
+    Returns
+    -------
+    bool
+        True if the segment intersects the sphere of radius R centered at origin.
+    """
+    photon_start = np.asarray(photon_start)
+    photon_end = np.asarray(photon_end)
+
+    d = photon_end - photon_start
+    a = np.dot(d, d)
+    b = 2.0 * np.dot(d, photon_start)
+    c = np.dot(photon_start, photon_start) - R**2
+
+    if a < 1e-9:
+        return False
+
+    disc = b*b - 4*a*c
+    if disc < 0:
+        return False
+
+    sqrt_disc = np.sqrt(disc)
+    ts = [(-b - sqrt_disc)/(2*a), (-b + sqrt_disc)/(2*a)]
+
+    for t in ts:
+        if 0 <= t <= 1:
+            return True  # intersects within the segment
+
+    return False
+
 def change_direction(g):
     """ Sample scattering direction using Henyey-Greenstein phase function """
     cos_theta = (1 / (2 * g)) * (1 + g ** 2 - ((1 - g ** 2) / (1 - g + 2 * g * np.random.rand())) ** 2)
@@ -207,6 +241,11 @@ def simulate_one_photon(GC):
 
         # Look to see if unalived
         if energy <= 1e-4:
+            alive = False
+
+        # Look to see if out of bound
+        # !!!!!!! <- boundary currently set to have the same radius as where detector is located
+        if detect_boundary(pos_start,pos,detector["r"]):
             alive = False
 
         # Scatter if undetected
