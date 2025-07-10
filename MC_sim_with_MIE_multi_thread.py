@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 from concurrent.futures import ProcessPoolExecutor
 import os,time
 from itertools import repeat
+#
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy.stats import norm
 
 # -----------------------------
 # INITIALIZE PHOTON
@@ -87,7 +91,7 @@ def setup_detector():
     return {
         "cone_axis": np.array([0.0, 0.0, 1]),
         "alpha": np.pi / 8,
-        "r": 1
+        "r": 2
     }
 
 def detect_photon(photon_start, photon_end, cone_axis, alpha, R):
@@ -141,44 +145,12 @@ def detect_photon(photon_start, photon_end, cone_axis, alpha, R):
 
     return False
 
-def detect_boundary(photon_start, photon_end, R):
+def detect_boundary(photon_end, r):
     #!!!!!!! <- boundary currently set to have the same radius as where detector is located
-    """
-    Parameters
-    ----------
-    photon_start, photon_end : (3,) array-like
-        Cartesian coordinates of the segment's start and end.
-    R : float
-        Sphere radius.
 
-    Returns
-    -------
-    bool
-        True if the segment intersects the sphere of radius R centered at origin.
-    """
-    photon_start = np.asarray(photon_start)
-    photon_end = np.asarray(photon_end)
-
-    d = photon_end - photon_start
-    a = np.dot(d, d)
-    b = 2.0 * np.dot(d, photon_start)
-    c = np.dot(photon_start, photon_start) - R**2
-
-    if a < 1e-9:
-        return False
-
-    disc = b*b - 4*a*c
-    if disc < 0:
-        return False
-
-    sqrt_disc = np.sqrt(disc)
-    ts = [(-b - sqrt_disc)/(2*a), (-b + sqrt_disc)/(2*a)]
-
-    for t in ts:
-        if 0 <= t <= 1:
-            return True  # intersects within the segment
-
-    return False
+    photon_end = np.array(photon_end)
+    distance = np.linalg.norm(photon_end)
+    return distance > r
 
 def change_direction(g):
     """ Sample scattering direction using Henyey-Greenstein phase function """
@@ -194,12 +166,12 @@ def change_direction(g):
 # -----------------------------
 def define_material(GC):
     return {
-        "mu_s": 1.0,
+        "mu_s": 1,
         "mu_a": .10,
         "g": 0.9,
         "n": 1.37,
-        "alpha": 1.0e-5,
-        "glucose_conc": 180.0,
+        "alpha": 1.0,
+        "glucose_conc": GC,
         "thickness": 0.04,
     }
 
@@ -245,7 +217,7 @@ def simulate_one_photon(GC):
 
         # Look to see if out of bound
         # !!!!!!! <- boundary currently set to have the same radius as where detector is located
-        if detect_boundary(pos_start,pos,detector["r"]):
+        if detect_boundary(pos,detector["r"]):
             alive = False
 
         # Scatter if undetected
@@ -271,6 +243,7 @@ def rotation_angle_calculation(GC,total_path_length):
 def simulate_multiple_photon(GC, n_photons):
     results = []
     step_counters = []
+    path_lengths_collector =[]
     death_counters = 0
 
     for _ in range(n_photons):
@@ -279,10 +252,22 @@ def simulate_multiple_photon(GC, n_photons):
         if alive:
             results.append(rotation_angle_calculation(GC,total_path_length))
             step_counters.append(step_counter)
+            path_lengths_collector.append(total_path_length)
         else:
             death_counters += 1
 
     print ("This many died", death_counters)
+    print ("Average path length", np.mean(path_lengths_collector))
+
+    data = np.array(results)
+    sns.histplot(data, kde=True, stat="density", label="Data", bins=30)
+    xmin, xmax = plt.xlim()
+    x = np.linspace(xmin, xmax, 100)
+    p = norm.pdf(x, np.mean(data), np.std(data))
+    plt.plot(x, p, 'k', linewidth=2, label="Gaussian fit")
+    plt.legend()
+    plt.title("Histogram with Gaussian Fit")
+    plt.show()
 
     return np.mean(results), np.mean(step_counters)
 
@@ -299,6 +284,7 @@ def simulate_one_gc(GC, n_photons):
     elapsed = (time.perf_counter() - start)/60
     print(f"[PID {pid}] processing GC = {GC} ended in {elapsed:.2f} minutes", flush=True)  # live announcement
     print(f"GC = {GC}, Angle = {angle}, Average steps = {steps}")
+
     return angle
 
 # -----------------------------
@@ -307,7 +293,7 @@ def simulate_one_gc(GC, n_photons):
 if __name__ == "__main__":
    n_cores = 1
    n_photons = 1000
-   GC_a=[2]
+   GC_a=[4]
    A=[]
 
    with ProcessPoolExecutor(max_workers=n_cores) as pool:
