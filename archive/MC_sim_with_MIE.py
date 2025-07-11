@@ -154,12 +154,6 @@ def simulate_one_photon(GC):
         D= rotation_matrix_phi(phi) @ M @ rotation_matrix_phi(phi)
         stokes = D @ stokes
 
-
-
-
-
-
-
     # Step 2: Set phi
     phi =0.0  #randomly sampled
     R_phi = rotation_matrix_phi(phi)

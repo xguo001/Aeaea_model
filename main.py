@@ -11,6 +11,18 @@ def print_hi(name):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
+
+    start = 0
+    alive = True
+
+    while alive:
+        end = start
+        start += 1
+        if start == 10:
+            alive = False
+
+        print ("start", start)
+        print ("end", end)
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
