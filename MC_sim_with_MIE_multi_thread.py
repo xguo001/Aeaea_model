@@ -91,7 +91,7 @@ def setup_detector():
     return {
         "cone_axis": np.array([0.0, 0.0, 1]),
         "alpha": np.pi / 8,
-        "r": 2
+        "r": 1
     }
 
 def detect_photon(photon_start, photon_end, cone_axis, alpha, R):
@@ -141,9 +141,9 @@ def detect_photon(photon_start, photon_end, cone_axis, alpha, R):
             P = photon_start + t * d
             cos_theta = np.dot(P, cone_axis) / np.linalg.norm(P)  # |P| == R
             if cos_theta >= cos_alpha - 1e-9:
-                return True
+                return True, ts[0]
 
-    return False
+    return False, None
 
 def detect_boundary(photon_end, r):
     #!!!!!!! <- boundary currently set to have the same radius as where detector is located
@@ -166,11 +166,11 @@ def change_direction(g):
 # -----------------------------
 def define_material(GC):
     return {
-        "mu_s": 1,
+        "mu_s": 10,
         "mu_a": .10,
         "g": 0.9,
         "n": 1.37,
-        "alpha": 1.0,
+        "alpha": 1.0e-5,
         "glucose_conc": GC,
         "thickness": 0.04,
     }
@@ -187,6 +187,7 @@ def simulate_one_photon(GC):
     mu_t = material["mu_s"] + material["mu_a"]
     total_path_length = 0
     alive = True
+    detected = False
     step_counter = 0
 
     while alive:
@@ -201,16 +202,6 @@ def simulate_one_photon(GC):
         # Energy decay
         energy = energy_decay(energy,mu_t, s)
 
-        # Glucose rotation
-        theta_glucose = material["alpha"] * material["glucose_conc"] * s
-        D = rotation_matrix_glucose(theta_glucose)
-        stokes = D @ stokes
-
-        # Look to see if detected
-        if detect_photon(pos_start,pos,detector["cone_axis"],detector["alpha"],detector["r"]):
-
-            return alive, step_counter, total_path_length, stokes
-
         # Look to see if unalived
         if energy <= 1e-4:
             alive = False
@@ -220,7 +211,25 @@ def simulate_one_photon(GC):
         if detect_boundary(pos,detector["r"]):
             alive = False
 
-        # Scatter if undetected
+        # Look to see if detected
+        photon_detected, t_value = detect_photon(pos_start,pos,detector["cone_axis"],detector["alpha"],detector["r"])
+        #print(photon_detected["detected"])
+        if photon_detected:
+
+            #Recalculate path to only pre-detector path
+            total_path_length -= (1-t_value)*s
+
+        # Rotate Angle and Polarize due to Glucose
+        theta_glucose = material["alpha"] * material["glucose_conc"] * s
+        D = rotation_matrix_glucose(theta_glucose)
+        stokes = D @ stokes
+
+        #If detected, we record. If not detected, we scatter and travel again
+        if photon_detected:
+
+            return alive, step_counter, total_path_length, stokes
+
+        # Scatter and Polarize due to scattering particle
         dir1= change_direction(g=0.9)
         phi= compute_phi(dir, dir1)
         dir=dir1
@@ -228,6 +237,7 @@ def simulate_one_photon(GC):
         D= rotation_matrix_phi(phi) @ M @ rotation_matrix_phi(phi)
         stokes = D @ stokes
 
+    #If we reach here, alive = false, so the rest of return doesn't matter
     return alive, step_counter, total_path_length, stokes
 
 # -----------------------------
@@ -293,7 +303,7 @@ def simulate_one_gc(GC, n_photons):
 if __name__ == "__main__":
    n_cores = 1
    n_photons = 1000
-   GC_a=[4]
+   GC_a=[2]
    A=[]
 
    with ProcessPoolExecutor(max_workers=n_cores) as pool:
