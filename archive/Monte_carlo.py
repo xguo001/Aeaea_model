@@ -3,6 +3,9 @@ import miepython
 import matplotlib.pyplot as plt
 import seaborn as sns
 from numba.np.arraymath import np_histogram
+from concurrent.futures import ProcessPoolExecutor
+from itertools import repeat
+import os, time
 
 # --- Constants ---
 MU_S = 10  # Scattering coefficient [1/cm]
@@ -14,6 +17,7 @@ medium_index=1.33
 sphere_index=1.57
 wavelength=1.55
 radius=0.05
+n_cores = 2
 # --- Helper Functions ---
 
 def sample_step(mu_t):
@@ -29,8 +33,6 @@ def sample_scatter_direction(g):
     dy = sin_theta * np.sin(phi)
     dz = cos_theta
     return np.array([dx, dy, dz])
-
-
 
 def rotate_stokes_vector(stokes, theta):
     """ Apply optical rotation to Stokes vector (rotate Q and U) """
@@ -106,7 +108,7 @@ def simulate_photon(GC):
         "total_path_length": path_length
     }
 
-def simulate_multiple_photons(n_photons):
+def simulate_multiple_photons(GC,n_photons):
     """ Run the simulation for multiple photons and collect results """
     results = []
     for _ in range(n_photons):
@@ -129,14 +131,14 @@ def plot_direction_angles(results):
         thetas.append(theta)
         phis.append(phi)
 
-    plt.figure(figsize=(6, 6))
-    plt.scatter(phis, thetas, alpha=0.6, s=10, edgecolor='k')
-    plt.xlabel("φ (Azimuthal Angle) [rad]")
-    plt.ylabel("θ (Polar Angle from z-axis) [rad]")
-    plt.title("Final Photon Direction Angles (θ vs. φ)")
-    plt.grid(True)
-    plt.tight_layout()
-    plt.show()
+#    plt.figure(figsize=(6, 6))
+#    plt.scatter(phis, thetas, alpha=0.6, s=10, edgecolor='k')
+#    plt.xlabel("φ (Azimuthal Angle) [rad]")
+#    plt.ylabel("θ (Polar Angle from z-axis) [rad]")
+#    plt.title("Final Photon Direction Angles (θ vs. φ)")
+#    plt.grid(True)
+#    plt.tight_layout()
+#    plt.show()
 def plot_rotation_angles(results):
     """ Plot histogram of total optical rotation angle (θ = α * C * path_length) """
     rotation_angles = [
@@ -144,36 +146,45 @@ def plot_rotation_angles(results):
         for r in results
     ]
     angle=sum(rotation_angles)/len(results)
-    print (sum(rotation_angles)/len(results))
-    plt.figure(figsize=(6, 4))
+#    print (sum(rotation_angles)/len(results))
+#    plt.figure(figsize=(6, 4))
     sns.histplot(rotation_angles, bins=20, kde=True, color='teal')
-    plt.xlabel("Total Optical Rotation Angle θ [rad]")
-    plt.ylabel("Photon Count")
-    plt.title("Distribution of Optical Rotation Angles")
-    plt.grid(True)
-    plt.xlim([3,6])
-    plt.ylim([0,500])
-    plt.tight_layout()
-    plt.show()
+#    plt.xlabel("Total Optical Rotation Angle θ [rad]")
+#    plt.ylabel("Photon Count")
+#    plt.title("Distribution of Optical Rotation Angles")
+#    plt.grid(True)
+#    plt.xlim([3,6])
+#    plt.ylim([0,500])
+#    plt.tight_layout()
+#    plt.show()
     return angle
+
+def one_gc_level(GC,n_photons):
+    start = time.perf_counter()
+    pid = os.getpid()
+    print(f"[PID {pid}] processing GC = {GC} begins", flush=True)  # live announcement
+
+    results = simulate_multiple_photons(GC,n_photons)
+    angle=plot_rotation_angles(results)
+
+    elapsed = (time.perf_counter() - start)/60
+    print(f"[PID {pid}] processing GC = {GC} ended in {elapsed:.2f} minutes", flush=True)  # live announcement
+    print(f"GC = {GC}, Angle = {angle:.2f}")
+    return angle
+
+
 # --- Run Simulation ---
 if __name__ == "__main__":
-    n_photons = 800
-    GC_a=[2,6,10,14,18,22,26]
+    n_photons = 2
+    GC_a = [2, 6, 10, 14, 18, 22, 26]
     A=[]
-    for GC in GC_a:
-        results = simulate_multiple_photons(n_photons)
-        for i, result in enumerate(results):
-            print(f"\nPhoton {i + 1}:")
-        for key, value in result.items():
-            print(f"  {key}: {value}")
-        angle=plot_rotation_angles(results)
-        A.append(angle)
-        print("Rotation angle:"+str(angle))
-        print("Glucose concentration:" +str(GC))
+
+    with ProcessPoolExecutor(max_workers=n_cores) as pool:
+        A = list(pool.map(one_gc_level, GC_a, repeat(n_photons)))
+
     plt.plot(GC_a,A)
     plt.xlabel("Glucose concentration")
     plt.ylabel("Rotation Angle")
     plt.title("GC vs. Angle")
     plt.show()
-    print(A)
+#    plt.savefig(r"/home/ubuntu/results/gc_angles.png",dpi=300)
