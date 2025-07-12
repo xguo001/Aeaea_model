@@ -16,7 +16,7 @@ def change_direction(g):
 # -----------------------------
 # PHOTON PROPAGATION AND MATRIX OPERATIONS (Eq. 5)
 # -----------------------------
-def simulate_one_photon(GC):
+def simulate_one_photon():
 
     # Initialize variables
 
@@ -25,8 +25,8 @@ def simulate_one_photon(GC):
     mu_t = get_material("mu_s") + get_material("mu_a")
     total_path_length = 0
     alive = True
-    detected = False
     step_counter = 0
+    gc = get_material("GC")
 
     while alive:
         pos_start = pos.copy()
@@ -60,7 +60,7 @@ def simulate_one_photon(GC):
             break
 
         # Rotate Angle and Polarize due to Glucose
-        theta_glucose = get_material("alpha") * get_material("GC") * (s/10)
+        theta_glucose = get_material("alpha") * gc * (s/10)
         D = rotation_matrix_glucose(theta_glucose)
         stokes = D @ stokes
 

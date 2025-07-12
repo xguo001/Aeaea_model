@@ -1,4 +1,18 @@
 import numpy as np
+
+# -----------------------------
+# MATERIAL PARAMETERS
+# -----------------------------
+
+parameters = {
+        "mu_s": 1, #cm^-1
+        "mu_a": .1, #cm^-1
+        "g": 0.9, #unitless
+        "n": 1.37, #unitless
+        "alpha": 1e-5, #degree per decimeter per g/ml
+        "GC": 0.001 # g/ml
+        }
+
 # -----------------------------
 # INITIALIZE PHOTON
 # -----------------------------
@@ -20,19 +34,6 @@ def setup_detector():
         "r": 1
     }
 
-# -----------------------------
-# MATERIAL PARAMETERS
-# -----------------------------
-
-parameters = {
-        "mu_s": 1, #cm^-1
-        "mu_a": .1, #cm^-1
-        "g": 0.9, #unitless
-        "n": 1.37, #unitless
-        "alpha": 1e-5, #degree per decimeter per g/ml
-        "GC": 3 # g/ml
-        }
-
 def set_material(key, value):
     if key not in parameters:
         raise KeyError(f"{key} is not a valid config key.")
@@ -51,6 +52,5 @@ def set_simulation_parameters():
 
     n_cores = 1
     n_photons = 1000
-    GC_a = [2]
 
-    return n_cores, n_photons, GC_a
+    return n_cores, n_photons
