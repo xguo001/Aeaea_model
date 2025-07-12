@@ -60,7 +60,7 @@ def simulate_one_photon(GC):
             break
 
         # Rotate Angle and Polarize due to Glucose
-        theta_glucose = get_material("alpha") * get_material("GC") * s
+        theta_glucose = get_material("alpha") * get_material("GC") * (s/10)
         D = rotation_matrix_glucose(theta_glucose)
         stokes = D @ stokes
 

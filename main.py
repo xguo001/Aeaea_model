@@ -12,10 +12,10 @@ from plot_them import plot_GC_vs_angles_plot
 if __name__ == "__main__":
 
     print( set_parameters.get_material("alpha") )
-    start=0.001
-    end=3
-    np=50
-    name="mu_s"
+    start=1
+    end=60
+    np=1
+    name="alpha"
     cons=[]
     results_angles=[]
     results_steps=[]

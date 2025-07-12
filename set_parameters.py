@@ -17,7 +17,7 @@ def setup_detector():
     return {
         "cone_axis": np.array([0.0, 0.0, 1]),
         "alpha": np.pi / 8,
-        "r": 2
+        "r": 1
     }
 
 # -----------------------------
@@ -25,12 +25,13 @@ def setup_detector():
 # -----------------------------
 
 parameters = {
-        "mu_s": 1,
-        "mu_a": 0.1,
-        "g": 0.9,
-        "n": 1.37,
-        "alpha": 1e-5,
-        "GC": 2}
+        "mu_s": 1, #cm^-1
+        "mu_a": .1, #cm^-1
+        "g": 0.9, #unitless
+        "n": 1.37, #unitless
+        "alpha": 1e-5, #degree per decimeter per g/ml
+        "GC": 3 # g/ml
+        }
 
 def set_material(key, value):
     if key not in parameters:
