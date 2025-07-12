@@ -1,5 +1,5 @@
 from computations import energy_decay, compute_phi, rotation_matrix_phi, rotation_matrix_glucose, mie_scattering_matrix_rayleigh
-from set_parameters import initialize_photon, setup_detector, define_material
+from set_parameters import initialize_photon, setup_detector, get_material
 from detectors import detect_boundary, detect_photon_v2
 import numpy as np
 
@@ -19,10 +19,10 @@ def change_direction(g):
 def simulate_one_photon(GC):
 
     # Initialize variables
-    material = define_material(GC)
+
     detector = setup_detector()
     pos, dir, stokes, energy = initialize_photon()
-    mu_t = material["mu_s"] + material["mu_a"]
+    mu_t = get_material("mu_s") + get_material("mu_a")
     total_path_length = 0
     alive = True
     detected = False
@@ -60,7 +60,7 @@ def simulate_one_photon(GC):
             break
 
         # Rotate Angle and Polarize due to Glucose
-        theta_glucose = material["alpha"] * material["glucose_conc"] * s
+        theta_glucose = get_material("alpha") * get_material("GC") * s
         D = rotation_matrix_glucose(theta_glucose)
         stokes = D @ stokes
 

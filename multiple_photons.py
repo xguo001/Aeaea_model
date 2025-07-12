@@ -29,7 +29,7 @@ def simulate_multiple_photon(GC, n_photons):
     print ("This many died", death_counters)
     print ("Average path length", np.mean(path_lengths_collector))
 
-    return np.mean(results), np.mean(step_counters)
+    return np.mean(results), np.mean(step_counters), np.mean(path_lengths_collector)
 
 # -----------------------------
 # WRAPPER AROUND SINGLE GLUCOSE LEVEL SIMUATION WITH MULTITHREADING AND ANGLE ROTATION PRINTOUT
@@ -39,10 +39,10 @@ def simulate_one_gc(GC, n_photons):
     pid = os.getpid()
     print(f"[PID {pid}] processing GC = {GC} begins", flush=True)  # live announcement
 
-    angle, steps = simulate_multiple_photon(GC, n_photons)
+    angle, steps, pathlength = simulate_multiple_photon(GC, n_photons)
 
     elapsed = (time.perf_counter() - start)/60
     print(f"[PID {pid}] processing GC = {GC} ended in {elapsed:.2f} minutes", flush=True)  # live announcement
     print(f"GC = {GC}, Angle = {angle}, Average steps = {steps}")
 
-    return angle
+    return angle, steps, pathlength

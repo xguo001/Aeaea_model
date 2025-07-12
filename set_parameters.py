@@ -1,5 +1,4 @@
 import numpy as np
-
 # -----------------------------
 # INITIALIZE PHOTON
 # -----------------------------
@@ -24,16 +23,24 @@ def setup_detector():
 # -----------------------------
 # MATERIAL PARAMETERS
 # -----------------------------
-def define_material(GC):
-    return {
+
+parameters = {
         "mu_s": 1,
-        "mu_a": .10,
+        "mu_a": 0.1,
         "g": 0.9,
         "n": 1.37,
-        "alpha": 1.0e-5,
-        "glucose_conc": GC,
-        "thickness": 0.04,
-    }
+        "alpha": 1e-5,
+        "GC": 2}
+
+def set_material(key, value):
+    if key not in parameters:
+        raise KeyError(f"{key} is not a valid config key.")
+    parameters[key] = value
+
+
+
+def get_material(key):
+    return parameters.get(key)
 
 # -----------------------------
 # MONTE CARLO SIMULATION PARAMETERS
@@ -42,7 +49,7 @@ def define_material(GC):
 def set_simulation_parameters():
 
     n_cores = 1
-    n_photons = 10
+    n_photons = 1000
     GC_a = [2]
 
     return n_cores, n_photons, GC_a
