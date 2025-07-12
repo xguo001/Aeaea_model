@@ -1,4 +1,4 @@
-from set_parameters import define_material
+import set_parameters
 import numpy as np
 
 # -----------------------------
@@ -70,5 +70,4 @@ def mie_scattering_matrix_rayleigh(theta_s):
 # TAKE THE TOTAL PATH LENGTH FROM A PHOTON'S JOURNEY AND RETURN THE ROTATION ANGLE (EQ.1 OF CHICKEN FINGER PAPER)
 # -----------------------------
 def rotation_angle_calculation(GC,total_path_length):
-
-    return GC*total_path_length*define_material(GC)["alpha"]
+    return GC*total_path_length*set_parameters.get_material("alpha")
