@@ -11,9 +11,9 @@ from plot_them import plot_GC_vs_angles_plot
 if __name__ == "__main__":
 
     print( set_parameters.get_material("GC") )
-    start=0.001
-    end=0.0045
-    loop=10
+    start= 0.5
+    end= 3.5
+    loop= 7
     name="GC"
     cons=[]
     results_angles=[]
@@ -39,12 +39,12 @@ if __name__ == "__main__":
         results_steps.append(results[1])
         results_paths.append(results[2])
 
-    print(results_angles)
-    plt.plot(cons,results_steps,"-o")
-    plt.ylabel("Steps")
-    plt.xlabel(name+" vs. Steps")
+    #print(results_angles)
+    #plt.plot(cons,results_steps,"-o")
+    #plt.ylabel("Steps")
+    #plt.xlabel(name+" vs. Steps")
     #plt.savefig("/Users/xwguo/Results/steps_vs"+str(name)+'.png',dpi=300)
-    plt.close()
+    #plt.close()
 
     plt.plot(cons, results_angles, "-o")
     plt.ylabel("angles")
@@ -53,8 +53,8 @@ if __name__ == "__main__":
     #plt.savefig("/Users/xwguo/Results/angles_vs" + str(name) + '.png', dpi=300)
     plt.close()
 
-    plt.plot(cons, results_paths, "-o")
-    plt.ylabel("pathlength")
-    plt.xlabel(name + " vs. pathlength")
+    #plt.plot(cons, results_paths, "-o")
+    #plt.ylabel("pathlength")
+    #plt.xlabel(name + " vs. pathlength")
     #plt.savefig("/Users/xwguo/Results/pathlength_vs" + str(name) + '.png', dpi=300)
-    plt.close()
+    #plt.close()

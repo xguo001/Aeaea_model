@@ -5,13 +5,21 @@ import numpy as np
 # -----------------------------
 
 parameters = {
+        #medium and scattering particle parameters
         "mu_s": 1, #cm^-1
         "mu_a": .1, #cm^-1
         "g": 0.9, #unitless
         "n": 1.37, #unitless
-        "alpha": 1e-5, #degree per decimeter per g/ml
-        "GC": 0.001 # g/ml
-        }
+        "alpha": 52.7, #degree per decimeter per g/ml
+        "GC": 2, # g/ml
+
+        #detector parameters
+        # A detector is defined by an angle and the r
+
+        "cone_axis": np.array([0.0, 0.0, 1]),
+        "cone_center": np.pi / 8,
+        "r": 0.6
+}
 
 # -----------------------------
 # INITIALIZE PHOTON
@@ -22,17 +30,6 @@ def initialize_photon():
     stokes = np.array([1.0, 1.0, 0.0, 0.0])  # linearly polarized along x
     energy = 1
     return position, direction, stokes, energy
-
-# -----------------------------
-# DETECTOR SETUP
-# -----------------------------
-def setup_detector():
-    # A detector is defined by an angle and the r
-    return {
-        "cone_axis": np.array([0.0, 0.0, 1]),
-        "alpha": np.pi / 8,
-        "r": 1
-    }
 
 def set_material(key, value):
     if key not in parameters:

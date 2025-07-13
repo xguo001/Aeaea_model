@@ -1,5 +1,6 @@
+
 from computations import energy_decay, compute_phi, rotation_matrix_phi, rotation_matrix_glucose, mie_scattering_matrix_rayleigh
-from set_parameters import initialize_photon, setup_detector, get_material
+from set_parameters import initialize_photon, get_material
 from detectors import detect_boundary, detect_photon_v2
 import numpy as np
 
@@ -20,7 +21,6 @@ def simulate_one_photon():
 
     # Initialize variables
 
-    detector = setup_detector()
     pos, dir, stokes, energy = initialize_photon()
     mu_t = get_material("mu_s") + get_material("mu_a")
     total_path_length = 0
@@ -46,7 +46,7 @@ def simulate_one_photon():
             break
 
         # Look to see if detected
-        detected_photon, t_value = detect_photon_v2(pos_start,pos,detector["cone_axis"],detector["alpha"],detector["r"])
+        detected_photon, t_value = detect_photon_v2(pos_start,pos,get_material("cone_axis"),get_material("cone_center"),get_material("r"))
 
         if detected_photon:
             #Recalculate path to only pre-detector path
@@ -55,7 +55,7 @@ def simulate_one_photon():
         # Look to see if out of bound
         # !!!!!!! <- boundary currently set to have the same radius as where detector is located
         #boundary detection must come after photon detection because we have same radius for both.
-        if not detected_photon and detect_boundary(pos,detector["r"]):
+        if not detected_photon and detect_boundary(pos,get_material("r")):
             alive = False
             break
 
