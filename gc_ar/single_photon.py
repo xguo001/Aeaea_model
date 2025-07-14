@@ -1,7 +1,7 @@
 
-from computations import energy_decay, compute_phi, rotation_matrix_phi, rotation_matrix_glucose, mie_scattering_matrix_rayleigh
-from set_parameters import initialize_photon, get_material
-from detectors import detect_boundary, detect_photon_v2
+from gc_ar.computations import energy_decay, compute_phi, rotation_matrix_phi, rotation_matrix_glucose, mie_scattering_matrix_rayleigh
+import gc_ar.set_parameters as set_parameters
+from gc_ar.detectors import detect_boundary, detect_photon_v2
 import numpy as np
 
 def change_direction(g):
@@ -21,12 +21,12 @@ def simulate_one_photon():
 
     # Initialize variables
 
-    pos, dir, stokes, energy = initialize_photon()
-    mu_t = get_material("mu_s") + get_material("mu_a")
+    pos, dir, stokes, energy = set_parameters.initialize_photon()
+    mu_t = set_parameters.get_material("mu_s") + set_parameters.get_material("mu_a")
     total_path_length = 0
     alive = True
     step_counter = 0
-    gc = get_material("GC")
+    gc = set_parameters.get_material("GC")
 
     while alive:
         pos_start = pos.copy()
@@ -46,7 +46,7 @@ def simulate_one_photon():
             break
 
         # Look to see if detected
-        detected_photon, t_value = detect_photon_v2(pos_start,pos,get_material("cone_axis"),get_material("cone_center"),get_material("r"))
+        detected_photon, t_value = detect_photon_v2(pos_start,pos,set_parameters.get_material("cone_axis"),set_parameters.get_material("cone_center"),set_parameters.get_material("r"))
 
         if detected_photon:
             #Recalculate path to only pre-detector path
@@ -55,12 +55,12 @@ def simulate_one_photon():
         # Look to see if out of bound
         # !!!!!!! <- boundary currently set to have the same radius as where detector is located
         #boundary detection must come after photon detection because we have same radius for both.
-        if not detected_photon and detect_boundary(pos,get_material("r")):
+        if not detected_photon and detect_boundary(pos,set_parameters.get_material("r")):
             alive = False
             break
 
         # Rotate Angle and Polarize due to Glucose
-        theta_glucose = get_material("alpha") * gc * (s/10)
+        theta_glucose = set_parameters.get_material("alpha") * gc * (s/10)
         D = rotation_matrix_glucose(theta_glucose)
         stokes = D @ stokes
 

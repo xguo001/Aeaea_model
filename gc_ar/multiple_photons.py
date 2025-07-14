@@ -1,6 +1,6 @@
-from set_parameters import get_material
-from single_photon import simulate_one_photon
-from computations import rotation_angle_calculation
+import gc_ar.set_parameters as set_parameters
+from gc_ar.single_photon import simulate_one_photon
+from gc_ar.computations import rotation_angle_calculation
 import numpy as np
 import os,time
 #
@@ -15,7 +15,7 @@ def simulate_multiple_photon(n_photons):
     step_counters = []
     path_lengths_collector =[]
     death_counters = 0
-    gc = get_material("GC")
+    gc = set_parameters.get_material("GC")
 
     for _ in range(n_photons):
         alive, step_counter, total_path_length, stokes = simulate_one_photon()
@@ -36,7 +36,7 @@ def simulate_multiple_photon(n_photons):
 # WRAPPER AROUND SINGLE GLUCOSE LEVEL SIMUATION WITH MULTITHREADING AND ANGLE ROTATION PRINTOUT
 # -----------------------------
 def simulate_one_gc(n_photons):
-    gc = get_material("GC")
+    gc = set_parameters.get_material("GC")
     start = time.perf_counter()
     pid = os.getpid()
     print(f"[PID {pid}] processing GC = {gc} begins", flush=True)  # live announcement
