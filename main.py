@@ -1,9 +1,7 @@
 import matplotlib.pyplot as plt
 
-import set_parameters
-from multiple_photons import simulate_one_gc
-from itertools import repeat
-from plot_them import plot_GC_vs_angles_plot
+import gc_ar.set_parameters as set_parameters
+from gc_ar.multiple_photons import simulate_one_gc
 
 # -----------------------------
 # RUN SIMULATION BASED ON NUMBER OF PHOTONS AND GLUCOSE LEVEL INPUTS, WRITE OUT TO A GRAPH
@@ -23,7 +21,7 @@ if __name__ == "__main__":
 
 
     def init_process(x):
-        import set_parameters
+        import gc_ar.set_parameters as set_parameters
         set_parameters.set_material(name, x)
 
 
