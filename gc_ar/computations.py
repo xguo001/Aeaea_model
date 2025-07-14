@@ -1,4 +1,4 @@
-import set_parameters
+import gc_ar.set_parameters as set_parameters
 import numpy as np
 
 # -----------------------------
