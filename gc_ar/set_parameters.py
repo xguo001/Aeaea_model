@@ -29,7 +29,9 @@ def initialize_photon():
     direction = np.array([0.0, 0.0, 1.0])
     stokes = np.array([1.0, 1.0, 0.0, 0.0])  # linearly polarized along x
     energy = 1
-    return position, direction, stokes, energy
+    x,y,z = position
+    energy_m= [energy,x,y,z]
+    return position, direction, stokes, energy, energy_m
 
 def set_material(key, value):
     if key not in parameters:
@@ -48,6 +50,6 @@ def get_material(key):
 def set_simulation_parameters():
 
     n_cores = 1
-    n_photons = 1000
+    n_photons = 2
 
     return n_cores, n_photons

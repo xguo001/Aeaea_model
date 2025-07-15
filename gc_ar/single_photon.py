@@ -3,7 +3,7 @@ from gc_ar.computations import energy_decay, compute_phi, rotation_matrix_phi, r
 import gc_ar.set_parameters as set_parameters
 from gc_ar.detectors import detect_boundary, detect_photon_v2
 import numpy as np
-
+    
 def change_direction(g):
     """ Sample scattering direction using Henyey-Greenstein phase function """
     cos_theta = (1 / (2 * g)) * (1 + g ** 2 - ((1 - g ** 2) / (1 - g + 2 * g * np.random.rand())) ** 2)
@@ -21,15 +21,22 @@ def simulate_one_photon():
 
     # Initialize variables
 
-    pos, dir, stokes, energy = set_parameters.initialize_photon()
+    pos, dir, stokes, energy, energy_m = set_parameters.initialize_photon()
+    pos_start = pos.copy()
+    energy_m0= energy_m.copy()
+    x0, y0, z0 = pos_start
     mu_t = set_parameters.get_material("mu_s") + set_parameters.get_material("mu_a")
+    mu_a = set_parameters.get_material("mu_a")
     total_path_length = 0
     alive = True
     step_counter = 0
     gc = set_parameters.get_material("GC")
+    abs_m=np.empty((0,4))
+
 
     while alive:
         pos_start = pos.copy()
+        x0,y0,z0 = pos_start
 
         # Travel step
         s = -np.log(np.random.rand()) / mu_t
@@ -38,7 +45,12 @@ def simulate_one_photon():
         step_counter += 1
 
         # Energy decay
-        energy = energy_decay(energy,mu_t, s)
+        energy_0=energy
+        energy = energy_decay(energy,mu_a, s)
+        x,y,z = pos
+        energy_m = [energy,x,y,z]
+        abs_m = np.vstack([abs_m, [energy-energy_0,x,y,z]])
+        print ("abs"+str(abs_m))
 
         # Look to see if unalived
         if energy <= 1e-4:
@@ -67,7 +79,7 @@ def simulate_one_photon():
         #If detected, we record. If not detected, we scatter and travel again
         if detected_photon:
 
-            return alive, step_counter, total_path_length, stokes
+            return alive, step_counter, total_path_length, stokes, abs_m
 
         # Scatter and Polarize due to scattering particle
         dir1= change_direction(g=0.9)
@@ -78,5 +90,5 @@ def simulate_one_photon():
         stokes = D @ stokes
 
     #If we reach here, alive = false, so the rest of return doesn't matter
-    return alive, step_counter, total_path_length, stokes
+    return alive, step_counter, total_path_length, stokes, abs_m
 
