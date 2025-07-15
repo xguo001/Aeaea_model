@@ -59,3 +59,18 @@ def detect_boundary(photon_end, r):
     distance = np.linalg.norm(photon_end)
     return distance > r
 
+def photon_roulette(energy, chance):
+    #implementing page 12 of the energy conservation paper
+    #if W <= threshold
+    #    if RND < chance, W = W / chance
+    #    else W=0 (kill photon)
+    #else do_nothing (photon continues)
+
+    if np.random.rand() < chance:
+        energy = energy / chance
+    else:
+        energy = 0
+
+    return energy
+
+

@@ -1,7 +1,7 @@
 
 from gc_ar.computations import energy_decay, compute_phi, rotation_matrix_phi, rotation_matrix_glucose, mie_scattering_matrix_rayleigh
 import gc_ar.set_parameters as set_parameters
-from gc_ar.detectors import detect_boundary, detect_photon_v2
+from gc_ar.detectors import detect_boundary, detect_photon_v2, photon_roulette
 import numpy as np
 
 def change_direction(g):
@@ -41,9 +41,11 @@ def simulate_one_photon():
         energy = energy_decay(energy,mu_t, s)
 
         # Look to see if unalived
-        if energy <= 1e-4:
-            alive = False
-            break
+        if energy <= set_parameters.get_material("energy_threshold"):
+            energy = photon_roulette(energy,set_parameters.get_material("chance"))
+            if energy == 0:
+                alive = False
+                break
 
         # Look to see if detected
         detected_photon, t_value = detect_photon_v2(pos_start,pos,set_parameters.get_material("cone_axis"),set_parameters.get_material("cone_center"),set_parameters.get_material("r"))
