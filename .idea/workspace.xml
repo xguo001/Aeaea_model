@@ -5,12 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="60a01724-c702-4284-8d59-d9650d4718a2" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/gc_ar/monitors.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gc_ar/computations.py" beforeDir="false" afterPath="$PROJECT_DIR$/gc_ar/computations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gc_ar/multiple_photons.py" beforeDir="false" afterPath="$PROJECT_DIR$/gc_ar/multiple_photons.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gc_ar/set_parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/gc_ar/set_parameters.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gc_ar/single_photon.py" beforeDir="false" afterPath="$PROJECT_DIR$/gc_ar/single_photon.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

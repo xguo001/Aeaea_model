@@ -46,11 +46,11 @@ def simulate_one_photon():
 
         # Energy decay
         energy_0=energy
-        energy = energy_decay(energy,mu_a, s)
+        energy = energy_decay(energy,mu_t, s)
         x,y,z = pos
         energy_m = [energy,x,y,z]
         abs_m = np.vstack([abs_m, [energy-energy_0,x,y,z]])
-        print ("abs"+str(abs_m))
+        #print ("abs"+str(abs_m))
 
         # Look to see if unalived
         if energy <= set_parameters.get_material("energy_threshold"):
