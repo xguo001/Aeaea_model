@@ -4,8 +4,8 @@ import numpy as np
 # -----------------------------
 # ENERGY DECAY
 # -----------------------------
-def energy_decay(energy,mu_t,r):
-    energy= energy*np.exp(-mu_t*r)
+def energy_decay(energy,mu_a,r):
+    energy= energy*np.exp(-mu_a*r)
     return energy
 
 def compute_phi(d_in, d_out):
