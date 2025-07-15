@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="465d32be-3fa2-4f02-a326-afcda3145fe7" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/gc_ar/detectors.py" beforeDir="false" afterPath="$PROJECT_DIR$/gc_ar/detectors.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gc_ar/set_parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/gc_ar/set_parameters.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gc_ar/single_photon.py" beforeDir="false" afterPath="$PROJECT_DIR$/gc_ar/single_photon.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 3
+}]]></component>
+  <component name="ProjectId" id="2zt0ZLpPr9CKEJfAEYlUA1vRxrc" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.detectors.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.single_photon.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "best-branch-winning"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-41e8cd69c857-64d779b69b7a-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.26927.90" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="465d32be-3fa2-4f02-a326-afcda3145fe7" name="Changes" comment="" />
+      <created>1752535118634</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1752535118634</updated>
+    </task>
+    <servers />
+  </component>
+</project>
