@@ -73,3 +73,38 @@ def mie_scattering_matrix_rayleigh(theta_s):
 def rotation_angle_calculation(GC,total_path_length):
     angle=GC*(total_path_length/10)*set_parameters.get_material("alpha") #degree
     return angle
+
+def mid_point(position_0,position_1):
+    return position_1 + (position_1 - position_0)/2
+
+def cut_path_at_boundary(photon_start, photon_end, R):
+    photon_start, photon_end = map(np.asarray, (photon_start, photon_end))
+
+    d = photon_end - photon_start
+    a = np.dot(d, d)
+    b = 2.0 * np.dot(d, photon_start)
+    c = np.dot(photon_start, photon_start) - R ** 2
+
+    if a < 1e-9:
+        print ("warning: bug in cut_path_boundary()")
+        return 0.0
+
+    disc = b * b - 4 * a * c
+    if disc < 0:
+        print ("warning: bug in cut_path_boundary()")
+        return 0.0  # no intersection
+
+    sqrt_disc = np.sqrt(disc)
+    ts = sorted([(-b - sqrt_disc) / (2 * a), (-b + sqrt_disc) / (2 * a)])
+
+    # Clip to segment [0, 1]
+    t1 = np.clip(ts[0], 0, 1)
+    t2 = np.clip(ts[1], 0, 1)
+
+    P1 = photon_start + t1 * d
+    P2 = photon_start + t2 * d
+
+    length_inside = np.linalg.norm(P2 - P1)
+    total_length = np.linalg.norm(d)
+
+    return length_inside / total_length
