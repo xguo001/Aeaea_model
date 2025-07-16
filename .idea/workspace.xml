@@ -5,15 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="60a01724-c702-4284-8d59-d9650d4718a2" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/Aeaea_model.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Aeaea_model.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gc_ar/computations.py" beforeDir="false" afterPath="$PROJECT_DIR$/gc_ar/computations.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gc_ar/multiple_photons.py" beforeDir="false" afterPath="$PROJECT_DIR$/gc_ar/multiple_photons.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gc_ar/photon.py" beforeDir="false" afterPath="$PROJECT_DIR$/gc_ar/photon.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gc_ar/plots.py" beforeDir="false" afterPath="$PROJECT_DIR$/gc_ar/plots.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gc_ar/results.py" beforeDir="false" afterPath="$PROJECT_DIR$/gc_ar/results.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gc_ar/set_parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/gc_ar/set_parameters.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gc_ar/single_photon.py" beforeDir="false" afterPath="$PROJECT_DIR$/gc_ar/single_photon.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,7 +48,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "best-branch-bug-fix",
     "ignore.virus.scanning.warn.message": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -240,6 +237,17 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
