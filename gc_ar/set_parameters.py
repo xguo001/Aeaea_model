@@ -8,7 +8,7 @@ parameters = {
         #medium and scattering particle parameters
         "mu_s": 1, #cm^-1
         "mu_a": .1, #cm^-1
-        "g": 0.9, #unitless
+        "g": 0.9, #unitless for Henyey-Greenstein
         "n": 1.37, #unitless
         "alpha": 52.7, #degree per decimeter per g/ml
         "GC": 2, # g/ml

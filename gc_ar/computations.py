@@ -108,3 +108,15 @@ def cut_path_at_boundary(photon_start, photon_end, R):
     total_length = np.linalg.norm(d)
 
     return length_inside / total_length
+
+
+def change_direction():
+    """ Sample scattering direction using Henyey-Greenstein phase function """
+    g = set_parameters.get_material("g")
+    cos_theta = (1 / (2 * g)) * (1 + g ** 2 - ((1 - g ** 2) / (1 - g + 2 * g * np.random.rand())) ** 2)
+    sin_theta = np.sqrt(1 - cos_theta ** 2)
+    phi = 2 * np.pi * np.random.rand()
+    dx = sin_theta * np.cos(phi)
+    dy = sin_theta * np.sin(phi)
+    dz = cos_theta
+    return np.array([dx, dy, dz])

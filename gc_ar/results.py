@@ -14,19 +14,19 @@ def conc_to_absorption_matrix(energy_position):
     #takes energy level, x, y, z and concatenante into the results
 
     results["absorption_matrix"] = np.vstack([results["absorption_matrix"], energy_position])
-    print("adding to absorption matrix", energy_position[0])
+#    print("adding to absorption matrix", energy_position[0])
 
 def conc_to_detected_energy(energy):
     #takes a scalar and concatenante
 
     results["detected_energy"] = np.vstack([results["detected_energy"], energy])
-    print("adding to energy",energy)
+#    print("adding to energy",energy)
 
 def conc_to_out_of_bound_energy(energy):
     #takes a scalar and concatenante
 
     results["out_of_bound_energy"] = np.vstack([results["out_of_bound_energy"], energy])
-    print ("adding to out-of-bound energy",energy)
+#    print ("adding to out-of-bound energy",energy)
 
 def return_absorption_matrix():
     return results["absorption_matrix"]

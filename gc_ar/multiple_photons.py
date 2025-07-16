@@ -1,4 +1,5 @@
 import gc_ar.set_parameters as set_parameters
+import gc_ar.photon as photon
 from gc_ar.single_photon import simulate_one_photon
 from gc_ar.computations import rotation_angle_calculation
 import numpy as np
@@ -16,12 +17,12 @@ def simulate_multiple_photon(n_photons):
     gc = set_parameters.get_material("GC")
 
     for _ in range(n_photons):
-        alive, step_counter, total_path_length, stokes = simulate_one_photon()
+        this_photon = simulate_one_photon()
 
-        if alive:
-            results.append(rotation_angle_calculation(gc,total_path_length))
-            step_counters.append(step_counter)
-            path_lengths_collector.append(total_path_length)
+        if this_photon.died_detected:
+            results.append(rotation_angle_calculation(gc,this_photon.total_path_length))
+            step_counters.append(this_photon.total_path_length)
+            path_lengths_collector.append(this_photon.total_path_length)
         else:
             death_counters += 1
 
