@@ -22,7 +22,11 @@ parameters = {
 
         #photon roulette parameter
         "chance": 0.1, #implementing p12. of energy conservation paper
-        "energy_threshold": 1e-4 #threshold energy level for photon to leave
+        "energy_threshold": 1e-4, #threshold energy level for photon to leave
+
+        #simulation paramters
+        "n_photons": 1000,
+
 }
 
 # -----------------------------
@@ -47,13 +51,3 @@ def set_material(key, value):
 def get_material(key):
     return parameters.get(key)
 
-# -----------------------------
-# MONTE CARLO SIMULATION PARAMETERS
-# -----------------------------
-
-def set_simulation_parameters():
-
-    n_cores = 1
-    n_photons = 1000
-
-    return n_cores, n_photons
