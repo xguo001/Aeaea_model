@@ -22,8 +22,6 @@ if __name__ == "__main__":
     output_length=[]
     output_paths = []
 
-
-
     def init_process(x):
         import gc_ar.set_parameters as set_parameters
         set_parameters.set_material(name, x)

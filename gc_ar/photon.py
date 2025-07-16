@@ -1,6 +1,6 @@
 import numpy as np
 import gc_ar.set_parameters as set_parameters
-from gc_ar.computations import rotation_matrix_glucose, change_direction, compute_phi, mie_scattering_matrix_rayleigh, rotation_matrix_phi
+from gc_ar.computations import rotation_matrix_glucose, change_direction, compute_phi, mie_scattering_matrix_rayleigh, rotation_matrix_phi, compute_ca1, compute_transmitted_direction, RFresnel
 
 class Photon:
     def __init__(self, position, direction, stokes,energy):
@@ -13,9 +13,13 @@ class Photon:
         self.total_path_length = 0.0
         self.total_step_count = 0.0
         self.died_detected = False
+        self.alive = True
 
     def update_position(self, step_size):
         self.position += step_size * self.direction
+
+    def update_position_without_step(self, new_position):
+        self.position = new_position
 
     def update_stokes_through_glucose_medium(self, s):
         # Rotate Angle and Polarize due to Glucose
@@ -58,3 +62,40 @@ class Photon:
 
     def update_position_hit_boundary(self,pos_start, t_value):
         self.position_hit_boundary = pos_start + t_value * (self.position - pos_start)
+
+    def reflection_transmission(self):
+        #Will reflect or transmit based on recorded boundary hit position -- will return error if boundary not hit
+        if np.array_equal(self.position_hit_boundary, [0,0,0]):
+            raise Exception("PROBLEM: REFLECTION FUNCTION CALLED WHEN BOUNDARY NOT HIT")
+
+        #calculate ca1
+        ca1, normal_vector = compute_ca1(self.position_hit_boundary, self.direction,set_parameters.get_material("r"))
+
+        #calculate ca2
+        r, ca2 = RFresnel(set_parameters.get_material("n"),set_parameters.get_material("n1"),ca1)
+
+#        position= photon.position_hit_boundary
+#        direction = photon.direction
+#        radius = get_material('r')
+#        ca1,normal=compute_ca1(position,direction,radius)
+#        n=get_material('n')
+#        n1=get_material('n1')
+#        r,ca2=RFresnel(n,n1,ca1)
+
+        #decide whether photon is reflected
+        if r <= np.random.rand():
+
+            self.direction = compute_transmitted_direction(self.direction, normal_vector, set_parameters.get_material("n"), set_parameters.get_material("n1"), ca2, ca1 )
+            print("this photon is reflected")
+
+            return True
+
+#            direction_new= compute_transmitted_direction(direction,normal,n,n1,ca2,ca1)
+#            photon.direction = direction_new
+#            photon.died_detected=True
+
+        else:
+
+            print("this photon went out of bound")
+
+            return False

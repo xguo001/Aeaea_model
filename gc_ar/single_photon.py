@@ -17,9 +17,8 @@ def simulate_one_photon():
     # Initialize variables
     this_photon= launch_a_photon(beam_radius=0.2,angle=0,z=0)
     mu_t = set_parameters.get_material("mu_s") + set_parameters.get_material("mu_a")
-    alive = True
 
-    while alive:
+    while this_photon.alive:
         pos_start = this_photon.position.copy()
 
         # Travel step
@@ -39,20 +38,21 @@ def simulate_one_photon():
             this_photon.update_energy_without_decay(photon_roulette(this_photon.energy,set_parameters.get_material("chance")))
 
             if this_photon.energy == 0:
-                alive = False
+                this_photon.alive = False
                 #concatenante to results the energy level and midpoint of the travel
                 results.conc_to_absorption_matrix(np.hstack(([energy_0 - this_photon.energy],mid_point(pos_start,this_photon.position))))
 
-                print("I died without energy")
-
+                #We have to break the while loop, so we don't have to check energy == 0 in later branches
                 return this_photon
+
+            #If photon survives photon roulette, then it keeps traveling like normal
 
         #Branch #2: Look to see if detected
         #t_value tells you what portion of the trajectory is inside vs. beyond the detector
         detected_photon, t_value = detect_photon_v2(pos_start,this_photon.position,set_parameters.get_material("cone_axis"),set_parameters.get_material("cone_center"),set_parameters.get_material("r"))
 
         if detected_photon:
-            alive = False
+            this_photon.alive = False
             #Recalculate path to only pre-detector path
             this_photon.update_path_length(-(1-t_value)*s)
 
@@ -68,18 +68,16 @@ def simulate_one_photon():
             # Rotate Angle and Polarize due to Glucose
             this_photon.update_stokes_through_glucose_medium(s)
 
+            #update this photon to detected
             this_photon.update_died_detected()
-
-            print("I died detected")
-            print(this_photon.position_hit_detector)
-
-            return this_photon
 
         #Branch #3: Look to see if out of bound
         # !!!!!!! <- boundary currently set to have the same radius as where detector is located
         #boundary detection must come after photon detection because we have same radius for both.
-        if not detected_photon and detect_boundary(this_photon.position,set_parameters.get_material("r")):
-            alive = False
+
+        hit_boundary = detect_boundary(this_photon.position,set_parameters.get_material("r"))
+
+        if not detected_photon and hit_boundary:
             #Need to cut path off at the boundary to calculate energy level
             #t_value = length inside / total length
             t_value = cut_path_at_boundary(pos_start, this_photon.position, set_parameters.get_material("r"))
@@ -87,33 +85,36 @@ def simulate_one_photon():
             #update position where boundary is hit
             this_photon.update_position_hit_boundary(pos_start,t_value)
 
-            #Scale energy and deposit at midpoint inside
+            #Scale energy and deposit at midpoint between start point and where boundary is
             results.conc_to_absorption_matrix(np.hstack(([(energy_0 - this_photon.energy)*t_value],mid_point(pos_start,this_photon.position_hit_boundary))))
 
-            #Deposit remainder of energy onto the boundary
-            results.conc_to_out_of_bound_energy(energy_0 - (energy_0 - this_photon.energy)*t_value)
-            print("I died out of bound before")
-            print(this_photon.position_hit_boundary)
-            #reflection_transmission(this_photon)
+            reflected = this_photon.reflection_transmission()
 
-            print("I died out of bound")
-            print(this_photon.position_hit_boundary)
+            if reflected:
+                #The direction of this photon has already been changed
+                #We need to update this photon's position, energy and path length to the boundary point and let it go from there
+                this_photon.update_position_without_step(this_photon.position_hit_boundary)
+                this_photon.update_energy_without_decay(energy_0 - (energy_0 - this_photon.energy)*t_value) #for energy formula, recall we have decay along the route and what would have been deposited to the boundary
+                this_photon.update_path_length(-(1 - t_value) * s)
 
-            return this_photon
+            else:
+                #if not reflected, then deposit energy and this photon's journey ends
+                #Deposit remainder of energy onto the boundary (the energy for the journey to the boundary has already been deposited)
+                this_photon.alive = False
+                results.conc_to_out_of_bound_energy(energy_0 - (energy_0 - this_photon.energy)*t_value)
+
 
         #Branch 4: keep traveling
+        if not detected_photon and not hit_boundary:
+            # Deposit energy
+            results.conc_to_absorption_matrix(np.hstack(([energy_0 - this_photon.energy],mid_point(pos_start,this_photon.position))))
 
-        # Deposit energy
-        results.conc_to_absorption_matrix(np.hstack(([energy_0 - this_photon.energy],mid_point(pos_start,this_photon.position))))
+            # Rotate Angle and Polarize due to Glucose
+            this_photon.update_stokes_through_glucose_medium(s)
 
-        # Rotate Angle and Polarize due to Glucose
-        this_photon.update_stokes_through_glucose_medium(s)
-
-        # Scatter and Polarize due to scattering particle
-        this_photon.update_mie_scattering_and_rotate()
+            # Scatter and Polarize due to scattering particle
+            this_photon.update_mie_scattering_and_rotate()
 
     #If we reach here, alive = false, and died detected = false, nothing to return since it's all in the photon class
-
-    print ("THERE IS A PROBLEM")
 
     return  this_photon
