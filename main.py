@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
-
 import gc_ar.set_parameters as set_parameters
 from gc_ar.multiple_photons import simulate_one_gc
+import numpy as np
+import gc_ar.results as results
 from gc_ar.monitors import absorption_monitor
 
 # -----------------------------
@@ -15,10 +16,10 @@ if __name__ == "__main__":
     loop= 1
     name="GC"
     cons=[]
-    results_angles=[]
-    results_steps=[]
-    results_length=[]
-    results_paths = []
+    output_angles=[]
+    output_steps=[]
+    output_length=[]
+    output_paths = []
 
 
 
@@ -34,14 +35,15 @@ if __name__ == "__main__":
         set_parameters.set_material(name,x)
         print("get x"+str(set_parameters.get_material(name)))
         n_cores, n_photons = set_parameters.set_simulation_parameters()
-        results=simulate_one_gc(n_photons)
-        results_angles.append(results[0])
-        results_steps.append(results[1])
-        results_paths.append(results[2])
-        abs_m=results[3]
-        e_total=absorption_monitor([0,0,0],width=1,length=1,height=1,absorbed_energy_matrix=abs_m)
+        output=simulate_one_gc(n_photons)
+        output_angles.append(output[0])
+        output_steps.append(output[1])
+        output_paths.append(output[2])
 
-    print("absorbed energy"+str(e_total))
+    print(results.return_absorption_matrix()[:, 0].sum())
+    print(np.sum(results.return_absorption_matrix()))
+    print(np.sum(results.return_out_of_bound_energy()))
+
     #print(results_angles)
     #plt.plot(cons,results_steps,"-o")
     #plt.ylabel("Steps")
@@ -49,10 +51,10 @@ if __name__ == "__main__":
     #plt.savefig("/Users/xwguo/Results/steps_vs"+str(name)+'.png',dpi=300)
     #plt.close()
 
-    plt.plot(cons, results_angles, "-o")
+    plt.plot(cons, output_angles, "-o")
     plt.ylabel("angles")
     plt.xlabel(name + " vs. angles")
-    #plt.show()
+    plt.show()
     #plt.savefig("/Users/xwguo/Results/angles_vs" + str(name) + '.png', dpi=300)
     plt.close()
 
