@@ -1,6 +1,6 @@
 import numpy as np
 from gc_ar.photon import Photon
-from gc_ar.computations import RFresnel,compute_ca1, compute_transmitted_direction
+from gc_ar.computations import RFresnel, compute_ca1, compute_transmitted_direction, compute_reflected_direction,fresnel_mueller_matrices
 from gc_ar.set_parameters import parameters,get_material
 def detect_photon_v2(photon_start, photon_end, cone_axis, alpha, R):
     """
@@ -83,14 +83,18 @@ def reflection_transmission(photon):
         ca1,normal=compute_ca1(position,direction,radius)
         n=get_material('n')
         n1=get_material('n1')
+        M_R, M_T, r, ca2 = fresnel_mueller_matrices(n,n1,ca1)
         r,ca2=RFresnel(n,n1,ca1)
         if r<=np.random.rand():
-            direction_new= compute_transmitted_direction(direction,normal,n,n1,ca2,ca1)
+            direction_new= compute_reflected_direction(direction,normal)
             photon.direction = direction_new
+            photon.stokes = M_R @ photon.stokes
             photon.died_detected=True
-            print("this photon is refelcted")
             return photon
         else:
+            direction_new = compute_transmitted_direction(direction, normal ,n, n1, ca2,ca1)
+            photon.direction = direction_new
+            photon.stokes = M_T @ photon.stokes
             print("this photon is transmitted")
             return photon
 

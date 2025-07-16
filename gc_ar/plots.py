@@ -38,3 +38,4 @@ def plot_energy_distribution(absorption_points):
     ax.set_title("Photon Energy Deposition Map")
     plt.tight_layout()
     plt.show()
+

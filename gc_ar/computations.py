@@ -17,10 +17,8 @@ def compute_phi(d_in, d_out):
     n_scat = np.cross(d_in, d_out)
     norm_ref = np.linalg.norm(n_ref)
     norm_scat = np.linalg.norm(n_scat)
-
     if norm_scat == 0:
         return 0.0
-
     dot = np.dot(n_ref, n_scat)
     cross = np.linalg.norm(np.cross(n_ref, n_scat))
     phi = np.arctan2(cross, dot)
@@ -193,3 +191,73 @@ def compute_transmitted_direction(d_in, normal, n1, n2, ca2,ca1):
     d_out = d_out / np.linalg.norm(d_out)
     return d_out
 
+def compute_reflected_direction(d_in, normal):
+    """
+    Computes the reflected direction vector when a photon hits a boundary.
+
+    Args:
+        d_in: np.array([dx, dy, dz]) — incident direction (unit vector)
+        normal: np.array([nx, ny, nz]) — surface normal (unit vector)
+
+    Returns:
+        d_reflected: reflected direction vector (unit vector)
+    """
+    d_in = d_in / np.linalg.norm(d_in)
+    normal = normal / np.linalg.norm(normal)
+
+    d_reflected = d_in - 2 * np.dot(d_in, normal) * normal
+    d_reflected = d_reflected / np.linalg.norm(d_reflected)
+    return d_reflected
+
+def fresnel_mueller_matrices(n1, n2, ca1):
+    """
+    Computes the Fresnel reflection and transmission Mueller matrices.
+
+    Args:
+        n1: refractive index of current medium
+        n2: refractive index of next medium
+        ca1: cosine of angle of incidence (theta1), scalar
+
+    Returns:
+        M_R: Mueller matrix for reflection (4x4)
+        M_T: Mueller matrix for transmission (4x4)
+        r: total unpolarized reflectance (scalar)
+        ca2: cosine of transmitted angle (None if total internal reflection)
+    """
+    ca1 = float(np.clip(ca1, -1.0, 1.0))
+    sin_theta1 = np.sqrt(max(0.0, 1.0 - ca1**2))
+    sin_theta2 = (n1 / n2) * sin_theta1
+
+    if sin_theta2 >= 1.0:
+        # Total internal reflection
+        return np.eye(4), np.zeros((4, 4)), 1.0, None
+
+    ca2 = np.sqrt(1.0 - sin_theta2**2)
+
+    # Fresnel coefficients for power reflectance
+    rs = ((n1 * ca1 - n2 * ca2) / (n1 * ca1 + n2 * ca2))**2
+    rp = ((n1 * ca2 - n2 * ca1) / (n1 * ca2 + n2 * ca1))**2
+    r = 0.5 * (rs + rp)
+
+    ts = 1 - rs
+    tp = 1 - rp
+
+    # Reflection Mueller matrix
+    sqrt_rsrp = np.sqrt(rs * rp)
+    M_R = 0.5 * np.array([
+        [rs + rp, rs - rp,     0,          0],
+        [rs - rp, rs + rp,     0,          0],
+        [0,       0,       2*sqrt_rsrp,    0],
+        [0,       0,           0,      2*sqrt_rsrp]
+    ])
+
+    # Transmission Mueller matrix
+    sqrt_tstp = np.sqrt(ts * tp)
+    M_T = 0.5 * np.array([
+        [ts + tp, ts - tp,     0,          0],
+        [ts - tp, ts + tp,     0,          0],
+        [0,       0,       2*sqrt_tstp,    0],
+        [0,       0,           0,      2*sqrt_tstp]
+    ])
+
+    return M_R, M_T, r, ca2
