@@ -94,7 +94,7 @@ def simulate_one_photon():
             results.conc_to_out_of_bound_energy(energy_0 - (energy_0 - this_photon.energy)*t_value)
             print("I died out of bound before")
             print(this_photon.position_hit_boundary)
-            #reflection_transmission(this_photon)
+            reflection_transmission(this_photon)
 
             print("I died out of bound")
             print(this_photon.position_hit_boundary)
