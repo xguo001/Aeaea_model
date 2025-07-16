@@ -36,12 +36,12 @@ if __name__ == "__main__":
         print("get x"+str(set_parameters.get_material(name)))
         n_cores, n_photons = set_parameters.set_simulation_parameters()
         output=simulate_one_gc(n_photons)
-        output_angles.append(results[0])
-        output_steps.append(results[1])
-        output_paths.append(results[2])
+        output_angles.append(output[0])
+        output_steps.append(output[1])
+        output_paths.append(output[2])
 
     print(results.return_absorption_matrix()[:, 0].sum())
-    print(np.sum(results.return_absorption_matrix()))
+    print(np.sum(results.return_detected_energy()))
     print(np.sum(results.return_out_of_bound_energy()))
 
     #print(results_angles)
@@ -51,7 +51,7 @@ if __name__ == "__main__":
     #plt.savefig("/Users/xwguo/Results/steps_vs"+str(name)+'.png',dpi=300)
     #plt.close()
 
-    plt.plot(cons, results_angles, "-o")
+    plt.plot(cons, output_angles, "-o")
     plt.ylabel("angles")
     plt.xlabel(name + " vs. angles")
     plt.show()

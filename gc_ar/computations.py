@@ -4,8 +4,8 @@ import numpy as np
 # -----------------------------
 # ENERGY DECAY
 # -----------------------------
-def energy_decay(energy,mu_a,r):
-    energy= energy*np.exp(-mu_a*r)
+def energy_decay(energy,mu_t,s):
+    energy= energy*np.exp(-mu_t*s)
     return energy
 
 def compute_phi(d_in, d_out):
@@ -75,7 +75,7 @@ def rotation_angle_calculation(GC,total_path_length):
     return angle
 
 def mid_point(position_0,position_1):
-    return position_1 + (position_1 - position_0)/2
+    return position_0 + (position_0 - position_1)/2
 
 def cut_path_at_boundary(photon_start, photon_end, R):
     photon_start, photon_end = map(np.asarray, (photon_start, photon_end))

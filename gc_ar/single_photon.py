@@ -40,6 +40,7 @@ def simulate_one_photon():
         step_counter += 1
 
         # Energy decay
+        print ("I started with: ",energy)
         energy_0 = energy
         energy = energy_decay(energy,mu_t, s)
 
@@ -82,7 +83,7 @@ def simulate_one_photon():
             print ("I'm in branch #3")
             #Need to cut path off at the boundary to calculate energy level
             #t_value = length inside / total length
-            t_value = cut_path_at_boundary(pos_start, pos_start, set_parameters.get_material("r"))
+            t_value = cut_path_at_boundary(pos_start, pos, set_parameters.get_material("r"))
 
             #Scale energy and deposit at midpoint inside
             results.conc_to_absorption_matrix(np.hstack(([(energy_0 - energy)*t_value],mid_point(pos_start,pos_start+t_value*(pos-pos_start)))))
