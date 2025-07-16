@@ -5,6 +5,8 @@ from gc_ar.computations import rotation_matrix_glucose, change_direction, comput
 class Photon:
     def __init__(self, position, direction, stokes,energy):
         self.position = position
+        self.position_hit_detector = [0,0,0]
+        self.position_hit_boundary = [0,0,0]
         self.direction = direction
         self.stokes = stokes
         self.energy = energy
@@ -50,3 +52,9 @@ class Photon:
 
     def update_died_detected(self):
         self.died_detected = True
+
+    def update_position_hit_detector(self,pos_start, t_value):
+        self.position_hit_detector = pos_start + t_value * (self.position - pos_start)
+
+    def update_position_hit_boundary(self,pos_start, t_value):
+        self.position_hit_boundary = pos_start + t_value * (self.position - pos_start)

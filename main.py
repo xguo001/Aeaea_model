@@ -14,7 +14,7 @@ if __name__ == "__main__":
     print( set_parameters.get_material("GC") )
     start= 0.5
     end= 3.5
-    loop= 7
+    loop= 1
     name="GC"
     cons=[]
     output_angles=[]

@@ -10,6 +10,7 @@ parameters = {
         "mu_a": .1, #cm^-1
         "g": 0.9, #unitless for Henyey-Greenstein
         "n": 1.37, #unitless
+        "n1": 1, #refractive index of air
         "alpha": 52.7, #degree per decimeter per g/ml
         "GC": 2, # g/ml
 
@@ -54,6 +55,6 @@ def get_material(key):
 def set_simulation_parameters():
 
     n_cores = 1
-    n_photons = 1000
+    n_photons = 10
 
     return n_cores, n_photons

@@ -1,5 +1,7 @@
 import numpy as np
-
+from gc_ar.photon import Photon
+from gc_ar.computations import RFresnel,compute_ca1, compute_transmitted_direction
+from gc_ar.set_parameters import parameters,get_material
 def detect_photon_v2(photon_start, photon_end, cone_axis, alpha, R):
     """
     Parameters
@@ -72,5 +74,27 @@ def photon_roulette(energy, chance):
         energy = 0
 
     return energy
+
+def reflection_transmission(photon):
+    if photon.died_detected==False:
+        position= photon.position_hit_boundary
+        direction = photon.direction
+        radius = get_material('r')
+        ca1,normal=compute_ca1(position,direction,radius)
+        n=get_material('n')
+        n1=get_material('n1')
+        r,ca2=RFresnel(n,n1,ca1)
+        if r<=np.random.rand():
+            direction_new= compute_transmitted_direction(direction,normal,n,n1,ca2,ca1)
+            photon.direction = direction_new
+            photon.died_detected=True
+            print("this photon is refelcted")
+            return photon
+        else:
+            print("this photon is transmitted")
+            return photon
+
+    else:
+        return photon
 
 

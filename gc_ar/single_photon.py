@@ -1,11 +1,12 @@
 import gc_ar.results as results
 from gc_ar.computations import energy_decay, compute_phi, rotation_matrix_phi, rotation_matrix_glucose, mie_scattering_matrix_rayleigh, cut_path_at_boundary, change_direction
 import gc_ar.set_parameters as set_parameters
-from gc_ar.detectors import detect_boundary, detect_photon_v2, photon_roulette
+from gc_ar.detectors import detect_boundary, detect_photon_v2, photon_roulette, reflection_transmission
 from gc_ar.computations import mid_point
 import numpy as np
 from gc_ar.photon import Photon
 from gc_ar.launch_photons import launch_a_photon
+
 
 
 # -----------------------------
@@ -42,6 +43,8 @@ def simulate_one_photon():
                 #concatenante to results the energy level and midpoint of the travel
                 results.conc_to_absorption_matrix(np.hstack(([energy_0 - this_photon.energy],mid_point(pos_start,this_photon.position))))
 
+                print("I died without energy")
+
                 return this_photon
 
         #Branch #2: Look to see if detected
@@ -53,8 +56,11 @@ def simulate_one_photon():
             #Recalculate path to only pre-detector path
             this_photon.update_path_length(-(1-t_value)*s)
 
+            #update position where detector is hit
+            this_photon.update_position_hit_detector(pos_start,t_value)
+
             #scale energy and deposit energy at path midpoint
-            results.conc_to_absorption_matrix(np.hstack(([(energy_0 - this_photon.energy)*t_value],mid_point(pos_start,pos_start+t_value*(this_photon.position - pos_start)))))
+            results.conc_to_absorption_matrix(np.hstack(([(energy_0 - this_photon.energy)*t_value],mid_point(pos_start,this_photon.position_hit_detector))))
 
             #deposit remaining energy to the detector
             results.conc_to_detected_energy([energy_0 - (energy_0 - this_photon.energy)*t_value])
@@ -63,6 +69,9 @@ def simulate_one_photon():
             this_photon.update_stokes_through_glucose_medium(s)
 
             this_photon.update_died_detected()
+
+            print("I died detected")
+            print(this_photon.position_hit_detector)
 
             return this_photon
 
@@ -75,11 +84,20 @@ def simulate_one_photon():
             #t_value = length inside / total length
             t_value = cut_path_at_boundary(pos_start, this_photon.position, set_parameters.get_material("r"))
 
+            #update position where boundary is hit
+            this_photon.update_position_hit_boundary(pos_start,t_value)
+
             #Scale energy and deposit at midpoint inside
-            results.conc_to_absorption_matrix(np.hstack(([(energy_0 - this_photon.energy)*t_value],mid_point(pos_start,pos_start+t_value*(this_photon.position-pos_start)))))
+            results.conc_to_absorption_matrix(np.hstack(([(energy_0 - this_photon.energy)*t_value],mid_point(pos_start,this_photon.position_hit_boundary))))
 
             #Deposit remainder of energy onto the boundary
             results.conc_to_out_of_bound_energy(energy_0 - (energy_0 - this_photon.energy)*t_value)
+            print("I died out of bound before")
+            print(this_photon.position_hit_boundary)
+            #reflection_transmission(this_photon)
+
+            print("I died out of bound")
+            print(this_photon.position_hit_boundary)
 
             return this_photon
 

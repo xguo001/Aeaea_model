@@ -1,6 +1,7 @@
 import gc_ar.set_parameters as set_parameters
 import numpy as np
 
+
 # -----------------------------
 # ENERGY DECAY
 # -----------------------------
@@ -120,3 +121,75 @@ def change_direction():
     dy = sin_theta * np.sin(phi)
     dz = cos_theta
     return np.array([dx, dy, dz])
+
+def compute_ca1(position, direction, sphere_radius):
+    """
+    Compute ca1 for a photon near a spherical boundary centered at origin.
+
+    Args:
+        position: np.array([x, y, z]) – photon position
+        direction: np.array([dx, dy, dz]) – photon direction (need not be normalized)
+        sphere_radius: float – radius of spherical boundary
+
+    Returns:
+        ca1: cosine of angle of incidence (positive scalar)
+    """
+    normal = np.array(position) / sphere_radius
+
+
+    theta = np.arctan2(normal[1], normal[0])
+    #normal = position / sphere_radius  # since position is on the surface
+    direction = direction / np.linalg.norm(direction)
+    ca1 = abs(np.dot(direction, normal))
+    return ca1, normal
+
+def RFresnel(n1, n2, ca1):
+    """
+    Calculates Fresnel reflectance (r) and cosine of transmission angle (ca2)
+    based on incident cosine ca1, and refractive indices n1 (current) and n2 (next).
+
+    Returns:
+        r   - Fresnel reflectance (probability of reflection)
+        ca2 - Cosine of transmission angle (if transmitted)
+    """
+
+    sin_theta1 = np.sqrt(max(0.0, 1.0 - ca1 ** 2))
+    sin_theta2 = (n1 / n2) * sin_theta1
+
+    if sin_theta2 >= 1.0:
+        # Total internal reflection
+        return 1.0, None
+
+    ca2 = np.sqrt(1.0 - sin_theta2 ** 2)
+
+    # Fresnel equations (unpolarized)
+    rs = ((n1 * ca1 - n2 * ca2) / (n1 * ca1 + n2 * ca2)) ** 2
+    rp = ((n1 * ca2 - n2 * ca1) / (n1 * ca2 + n2 * ca1)) ** 2
+    r = 0.5 * (rs + rp)
+
+    return r, ca2
+
+
+def compute_transmitted_direction(d_in, normal, n1, n2, ca2,ca1):
+    """
+    Computes transmitted direction vector given ca2 (cos theta2).
+
+    Args:
+        d_in: np.array([dx, dy, dz]) — incident direction (unit vector)
+        normal: np.array([nx, ny, nz]) — surface normal (unit vector)
+        n1: refractive index of current medium
+        n2: refractive index of next medium
+        ca2: cosine of transmission angle (theta2)
+
+    Returns:
+        d_out: transmitted direction vector (unit vector)
+    """
+    d_in = d_in / np.linalg.norm(d_in)
+    normal = normal / np.linalg.norm(normal)
+
+    eta = n1 / n2
+
+    d_out = eta * d_in + (eta * ca1 - ca2) * normal
+    d_out = d_out / np.linalg.norm(d_out)
+    return d_out
+
