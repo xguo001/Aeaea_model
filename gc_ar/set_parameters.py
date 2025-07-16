@@ -18,7 +18,7 @@ parameters = {
 
         "cone_axis": np.array([0.0, 0.0, 1]),
         "cone_center": np.pi / 8,
-        "r": 10,
+        "r": 0.6,
 
         #photon roulette parameter
         "chance": 0.1, #implementing p12. of energy conservation paper
@@ -54,6 +54,6 @@ def get_material(key):
 def set_simulation_parameters():
 
     n_cores = 1
-    n_photons = 10
+    n_photons = 1000
 
     return n_cores, n_photons

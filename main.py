@@ -3,6 +3,7 @@ import gc_ar.set_parameters as set_parameters
 from gc_ar.multiple_photons import simulate_one_gc
 import numpy as np
 import gc_ar.results as results
+from gc_ar.plots import plot_energy_distribution
 from gc_ar.monitors import absorption_monitor
 
 # -----------------------------
@@ -13,7 +14,7 @@ if __name__ == "__main__":
     print( set_parameters.get_material("GC") )
     start= 0.5
     end= 3.5
-    loop= 1
+    loop= 7
     name="GC"
     cons=[]
     output_angles=[]
@@ -56,7 +57,8 @@ if __name__ == "__main__":
     plt.xlabel(name + " vs. angles")
     plt.show()
     #plt.savefig("/Users/xwguo/Results/angles_vs" + str(name) + '.png', dpi=300)
-    plt.close()
+    #plt.close()
+    #plot_energy_distribution(results.return_absorption_matrix())
 
     #plt.plot(cons, results_paths, "-o")
     #plt.ylabel("pathlength")

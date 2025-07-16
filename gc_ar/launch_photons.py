@@ -1,12 +1,13 @@
 import numpy as np
 from gc_ar.set_parameters import initialize_photon
-from photon import Photon
+from gc_ar.photon import Photon
 def launch_a_photon(beam_radius,angle,z):
     #default to luanching photons into x-y plane at position z with an angle
+    #stokes is defined as 1,1,0,0
     r=beam_radius*np.sqrt(-np.log(np.random.rand()))
     beta=np.pi*2*np.random.rand()
-    x=r*np.cos(angle)
-    y=r*np.sin(angle)
+    x=r*np.cos(beta)
+    y=r*np.sin(beta)
 
     dx= np.cos(angle)
     dy= 0
