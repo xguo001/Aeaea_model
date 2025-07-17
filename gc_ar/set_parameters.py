@@ -8,8 +8,10 @@ parameters = {
         #medium and scattering particle parameters
         "mu_s": 1, #cm^-1
         "mu_a": .1, #cm^-1
+        "dmu_a": 0.001,
         "g": 0.9, #unitless for Henyey-Greenstein
         "n": 1.37, #unitless
+        "n1": 1,
         "alpha": 52.7, #degree per decimeter per g/ml
         "GC": 2, # g/ml
 
@@ -25,7 +27,7 @@ parameters = {
         "energy_threshold": 1e-4, #threshold energy level for photon to leave
 
         #simulation paramters
-        "n_photons": 1000,
+        "n_photons": 100,
 
 }
 
