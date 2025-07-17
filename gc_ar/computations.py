@@ -193,7 +193,7 @@ def compute_transmitted_direction(d_in, normal, n1, n2, ca2,ca1):
     d_out = d_out / np.linalg.norm(d_out)
     return d_out
 
-def compute_reflected_direction(d_in, normal):
+def compute_reflected_direction(d_in, normal,n1,n2):
     """
     Computes the reflected direction vector when a photon hits a boundary.
 
@@ -206,10 +206,18 @@ def compute_reflected_direction(d_in, normal):
     """
     d_in = d_in / np.linalg.norm(d_in)
     normal = normal / np.linalg.norm(normal)
+    ca1 = -np.dot(d_in, normal)  # cos(theta1)
 
-    d_reflected = d_in - 2 * np.dot(d_in, normal) * normal
-    d_reflected = d_reflected / np.linalg.norm(d_reflected)
-    return d_reflected
+    # Total internal reflection check
+    sin_theta2_sq = (n1 / n2) ** 2 * (1.0 - ca1 ** 2)
+    if sin_theta2_sq > 1.0:
+        # TIR — must reflect
+        d_reflected = d_in + 2 * ca1 * normal
+        return d_reflected / np.linalg.norm(d_reflected)
+
+    # Partial reflection — always reflect (ignore transmission)
+    d_reflected = d_in + 2 * ca1 * normal
+    return d_reflected / np.linalg.norm(d_reflected)
 
 def fresnel_mueller_matrices(n1, n2, ca1):
     """

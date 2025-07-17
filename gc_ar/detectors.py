@@ -86,7 +86,7 @@ def reflection_transmission(photon):
         M_R, M_T, r, ca2 = fresnel_mueller_matrices(n,n1,ca1)
         r,ca2=RFresnel(n,n1,ca1)
         if r<=np.random.rand():
-            direction_new= compute_reflected_direction(direction,normal)
+            direction_new= compute_reflected_direction(direction,normal,n,n1)
             photon.direction = direction_new
             photon.stokes = M_R @ photon.stokes
             photon.died_detected=True

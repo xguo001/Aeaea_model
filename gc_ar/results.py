@@ -14,6 +14,7 @@ results = {
     #Sweeped variable vs. output matrix
     #variable, np.mean(results), np.mean(step_counters), np.mean(path_lengths_collector), death_counters
     "variable_vs_output": np.empty((0, 5)),
+
 }
 
 def conc_to_absorption_matrix(energy_position):
