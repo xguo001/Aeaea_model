@@ -1,6 +1,6 @@
 import numpy as np
 import gc_ar.set_parameters as set_parameters
-from gc_ar.computations import rotation_matrix_glucose, change_direction, compute_phi, mie_scattering_matrix_rayleigh, rotation_matrix_phi, compute_ca1, compute_transmitted_direction, RFresnel
+from gc_ar.computations import rotation_matrix_glucose, change_direction, compute_phi, mie_scattering_matrix_rayleigh, rotation_matrix_phi, compute_ca1, compute_transmitted_direction, RFresnel,mu_a_circular_dichroism
 
 class Photon:
     def __init__(self, position, direction, stokes,energy):
@@ -43,7 +43,9 @@ class Photon:
         self.direction = matrix @ self.direction
 
     def update_energy(self,s):
-        self.energy = self.energy * np.exp(-(set_parameters.get_material("mu_a")+set_parameters.get_material("mu_s")) * s)
+        stokes = self.stokes
+        mu_at=mu_a_circular_dichroism(stokes)
+        self.energy = self.energy * np.exp(-mu_at * s)
 
     def update_energy_without_decay(self,energy):
         self.energy = energy

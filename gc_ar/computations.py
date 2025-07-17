@@ -152,6 +152,8 @@ def RFresnel(n1, n2, ca1):
     """
 
     sin_theta1 = np.sqrt(max(0.0, 1.0 - ca1 ** 2))
+    print("n1", n1)
+    print("n2", n2)
     sin_theta2 = (n1 / n2) * sin_theta1
 
     if sin_theta2 >= 1.0:
@@ -261,3 +263,26 @@ def fresnel_mueller_matrices(n1, n2, ca1):
     ])
 
     return M_R, M_T, r, ca2
+
+def mu_a_circular_dichroism(stokes):
+    """
+    Computes the effective absorption coefficient μ_a based on circular dichroism.
+
+    Args:
+        stokes: np.array([I, Q, U, V]) — Stokes vector
+        mu_0: float — baseline absorption coefficient (isotropic component)
+        delta_mu: float — differential absorption for circular polarization (CD strength)
+
+    Returns:
+        mu_a: float — effective absorption coefficient adjusted for polarization
+    """
+    mu_0=set_parameters.get_material("mu_a")
+    delta_mu=set_parameters.get_material("dmu_a")
+    I, Q, U, V = stokes
+
+    if I <= 0:
+        return mu_0  # avoid divide-by-zero or negative intensity
+
+    circularity = V / I
+    mu_at = mu_0 + delta_mu * circularity
+    return mu_at
