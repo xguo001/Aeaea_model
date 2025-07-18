@@ -6,7 +6,6 @@ class Photon:
     def __init__(self, position, direction, stokes,energy):
         self.position = position
         self.position_hit_detector = [0,0,0]
-        self.position_hit_boundary = [0,0,0]
         self.direction = direction
         self.stokes = stokes
         self.energy = energy
@@ -63,15 +62,16 @@ class Photon:
         self.position_hit_detector = pos_start + t_value * (self.position - pos_start)
 
     def update_position_hit_boundary(self,pos_start, t_value):
-        self.position_hit_boundary = pos_start + t_value * (self.position - pos_start)
+        self.position = pos_start + t_value * (self.position - pos_start)
 
     def reflection_transmission(self):
-        #Will reflect or transmit based on recorded boundary hit position -- will return error if boundary not hit
-        if np.array_equal(self.position_hit_boundary, [0,0,0]):
-            raise Exception("PROBLEM: REFLECTION FUNCTION CALLED WHEN BOUNDARY NOT HIT")
+        #Will reflect or transmit based on recorded boundary hit position -- return value is whether photon is reflected
+        #Will check whether the new direction is facing outside of the sphere or inside of the sphere. If outside, terminate the photon
+        #Why this works:
+        # The position vector P points from the origin (center) to the point on the sphere, so it always points radially outward. The dot product measures how much your direction vector D aligns with this outward radial direction. A positive dot product means they point in similar directions (outward), while a negative dot product means they point in opposite directions (inward).
 
         #calculate ca1
-        ca1, normal_vector = compute_ca1(self.position_hit_boundary, self.direction,set_parameters.get_material("r"))
+        ca1, normal_vector = compute_ca1(self.position, self.direction,set_parameters.get_material("r"))
 
         #calculate ca2
         r, ca2 = RFresnel(set_parameters.get_material("n"),set_parameters.get_material("n1"),ca1)
@@ -88,16 +88,25 @@ class Photon:
         if r <= np.random.rand():
 
             self.direction = compute_transmitted_direction(self.direction, normal_vector, set_parameters.get_material("n"), set_parameters.get_material("n1"), ca2, ca1 )
-            print("this photon is reflected")
+            print ("I'm turning this way: ", self.direction)
+            print ("The dot plot is giving this answer: ", np.dot(self.direction, self.position))
 
-            return True
+            # If P · D < 0: The direction points inward (toward the center)
+            if np.dot(self.direction,self.position) <0:
+
+                return True
+
+            # If P · D > 0: The direction points outward (away from the center)
+            # If P · D = 0: The direction is tangential to the sphere
+
+            else:
+
+                return False
 
 #            direction_new= compute_transmitted_direction(direction,normal,n,n1,ca2,ca1)
 #            photon.direction = direction_new
 #            photon.died_detected=True
 
         else:
-
-            print("this photon went out of bound")
 
             return False

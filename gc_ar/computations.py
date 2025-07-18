@@ -152,8 +152,6 @@ def RFresnel(n1, n2, ca1):
     """
 
     sin_theta1 = np.sqrt(max(0.0, 1.0 - ca1 ** 2))
-    print("n1", n1)
-    print("n2", n2)
     sin_theta2 = (n1 / n2) * sin_theta1
 
     if sin_theta2 >= 1.0:
