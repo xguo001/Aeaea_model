@@ -85,28 +85,28 @@ class Photon:
 #        r,ca2=RFresnel(n,n1,ca1)
 
         #decide whether photon is reflected
-        if r <= np.random.rand():
-
-            self.direction = compute_transmitted_direction(self.direction, normal_vector, set_parameters.get_material("n"), set_parameters.get_material("n1"), ca2, ca1 )
-            print ("I'm turning this way: ", self.direction)
-            print ("The dot plot is giving this answer: ", np.dot(self.direction, self.position))
-
-            # If P · D < 0: The direction points inward (toward the center)
-            if np.dot(self.direction,self.position) <0:
-
-                return True
-
-            # If P · D > 0: The direction points outward (away from the center)
-            # If P · D = 0: The direction is tangential to the sphere
-
-            else:
-
-                return False
-
-#            direction_new= compute_transmitted_direction(direction,normal,n,n1,ca2,ca1)
-#            photon.direction = direction_new
-#            photon.died_detected=True
-
+        if np.random.rand() < r:
+            # Photon is reflected
+            from gc_ar.computations import compute_reflected_direction
+            self.direction = compute_reflected_direction(self.direction, normal_vector, set_parameters.get_material("n"), set_parameters.get_material("n1"))
+            return False  # Photon stays inside sphere
         else:
+            # Photon is transmitted (only if ca2 is not None)
+            if ca2 is not None:
+                self.direction = compute_transmitted_direction(self.direction, normal_vector, set_parameters.get_material("n"), set_parameters.get_material("n1"), ca2, ca1)
+                print ("I'm turning this way: ", self.direction)
+                print ("The dot plot is giving this answer: ", np.dot(self.direction, self.position))
 
-            return False
+                # If P · D < 0: The direction points inward (toward the center)
+                if np.dot(self.direction,self.position) <0:
+                    return True
+
+                # If P · D > 0: The direction points outward (away from the center)
+                # If P · D = 0: The direction is tangential to the sphere
+                else:
+                    return False
+            else:
+                # Total internal reflection case - should not happen since r=1.0
+                from gc_ar.computations import compute_reflected_direction
+                self.direction = compute_reflected_direction(self.direction, normal_vector, set_parameters.get_material("n"), set_parameters.get_material("n1"))
+                return False

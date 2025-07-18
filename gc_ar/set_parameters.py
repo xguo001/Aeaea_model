@@ -11,7 +11,7 @@ parameters = {
         "dmu_a": 0.001,
         "g": 0.9, #unitless for Henyey-Greenstein
         "n": 1.37, #unitless
-        "n1": 1,
+        "n1": 5,
         "alpha": 52.7, #degree per decimeter per g/ml
         "GC": 2, # g/ml
 
