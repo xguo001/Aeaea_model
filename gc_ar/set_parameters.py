@@ -11,7 +11,7 @@ parameters = {
         "dmu_a": 0.001,
         "g": 0.9, #unitless for Henyey-Greenstein
         "n": 1.37, #unitless
-        "n1": 5,
+        "n1": 1,
         "alpha": 52.7, #degree per decimeter per g/ml
         "GC": 2, # g/ml
 
@@ -27,7 +27,7 @@ parameters = {
         "energy_threshold": 1e-4, #threshold energy level for photon to leave
 
         #simulation paramters
-        "n_photons": 10,
+        "n_photons": 100,
 
 }
 

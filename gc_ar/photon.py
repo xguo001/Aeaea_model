@@ -85,11 +85,13 @@ class Photon:
 #        r,ca2=RFresnel(n,n1,ca1)
 
         #decide whether photon is reflected
-        if np.random.rand() < r:
+        if np.random.rand() <= r:
             # Photon is reflected
             from gc_ar.computations import compute_reflected_direction
             self.direction = compute_reflected_direction(self.direction, normal_vector, set_parameters.get_material("n"), set_parameters.get_material("n1"))
-            return False  # Photon stays inside sphere
+
+            print("----------look at me!-------------")
+            return True  # Photon stays inside sphere
         else:
             # Photon is transmitted (only if ca2 is not None)
             if ca2 is not None:

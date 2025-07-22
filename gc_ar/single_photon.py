@@ -28,11 +28,15 @@ def simulate_one_photon():
         this_photon.update_position(s)
         this_photon.update_step_count()
 
+
         print ("I'm in a new loop: ", this_photon.position)
 
         # Energy decay
         energy_0 = this_photon.energy
         this_photon.update_energy(s)
+
+        # save results to energy matrix
+        #results.conc_to_energy_matrix(np.hstack(([this_photon.energy], this_photon.position)))
 
         #Branch #1: Look to see if unalived
 
@@ -46,7 +50,6 @@ def simulate_one_photon():
                 this_photon.alive = False
                 #concatenante to results the energy level and midpoint of the travel
                 results.conc_to_absorption_matrix(np.hstack(([energy_0 - this_photon.energy],mid_point(pos_start,this_photon.position))))
-
                 #We have to break the while loop, so we don't have to check energy == 0 in later branches
                 return this_photon
 
@@ -98,7 +101,7 @@ def simulate_one_photon():
 
             #Scale energy and deposit at midpoint between start point and where boundary is
             results.conc_to_absorption_matrix(np.hstack(([(energy_0 - this_photon.energy)*t_value],mid_point(pos_start,this_photon.position))))
-
+            #results.conc_to_energy_matrix(np.hstack(([this_photon.energy], this_photon.position)))
             reflected = this_photon.reflection_transmission()
 
             if reflected:
@@ -107,6 +110,7 @@ def simulate_one_photon():
                 this_photon.update_energy_without_decay(energy_0 - (energy_0 - this_photon.energy)*t_value) #for energy formula, recall we have decay along the route and what would have been deposited to the boundary
                 this_photon.update_path_length(-(1 - t_value) * s)
                 print ("I'm gonna keep going")
+                results.conc_to_energy_matrix(np.hstack(([this_photon.energy], this_photon.position)))
 
             else:
                 #if not reflected, then deposit remaining energy and this photon's journey ends

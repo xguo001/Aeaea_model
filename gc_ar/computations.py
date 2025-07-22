@@ -1,6 +1,6 @@
 import gc_ar.set_parameters as set_parameters
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 # -----------------------------
 # ENERGY DECAY
@@ -210,11 +210,39 @@ def compute_reflected_direction(d_in, normal,n1,n2):
     sin_theta2_sq = (n1 / n2) ** 2 * (1.0 - ca1 ** 2)
     if sin_theta2_sq > 1.0:
         # TIR — must reflect
-        d_reflected = d_in + 2 * ca1 * normal
+        d_reflected = d_in - 2 * np.dot(d_in, normal) * normal
         return d_reflected / np.linalg.norm(d_reflected)
 
     # Partial reflection — always reflect (ignore transmission)
-    d_reflected = d_in + 2 * ca1 * normal
+    d_reflected = d_in - 2 * np.dot(d_in, normal) * normal
+
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    origin = np.array([0, 0, 0])
+    scale = 1.0
+
+    # Plot incoming ray
+    ax.quiver(*origin, *d_in, color='blue', length=scale, label='Incoming')
+    # Plot normal
+    ax.quiver(*origin, *normal, color='green', length=scale, linestyle='dotted', label='Surface Normal')
+    # Plot reflected ray
+    ax.quiver(*origin, *d_reflected, color='red', length=scale, label='Reflected')
+
+    ax.set_xlim([-scale, scale])
+    ax.set_ylim([-scale, scale])
+    ax.set_zlim([-scale, scale])
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    ax.set_title("Photon Reflection Visualization")
+    ax.legend()
+    plt.tight_layout()
+    plt.show()
+
+
+
     return d_reflected / np.linalg.norm(d_reflected)
 
 def fresnel_mueller_matrices(n1, n2, ca1):
