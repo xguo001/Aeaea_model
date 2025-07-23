@@ -32,9 +32,6 @@ if __name__ == "__main__":
         output = simulate_multiple_photon(set_parameters.get_material("n_photons"))
         results.conc_to_variable_vs_output(np.hstack(([x],output)))
 
-    print(results.return_absorption_matrix()[:, 0].sum())
-    print(np.sum(results.return_detected_energy()))
-    print(np.sum(results.return_out_of_bound_energy()))
 
     #Plot everything
     #plot_variable_vs_angle(name)
@@ -46,4 +43,3 @@ if __name__ == "__main__":
     path=np.array(results.return_energy_matrix())
     plot_variable_vs_angle(name)
     plot_photon_paths([path],detector,sphere_radius=0.6)
-    print(len(path))

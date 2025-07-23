@@ -1,6 +1,6 @@
 import numpy as np
 import gc_ar.set_parameters as set_parameters
-from gc_ar.computations import rotation_matrix_glucose, change_direction, compute_phi, mie_scattering_matrix_rayleigh, rotation_matrix_phi, compute_ca1, compute_transmitted_direction, RFresnel,mu_a_circular_dichroism
+from gc_ar.computations import rotation_matrix_glucose, change_direction, compute_phi, mie_scattering_matrix_rayleigh, rotation_matrix_phi, compute_ca1, compute_transmitted_direction, RFresnel,mu_a_circular_dichroism, compute_reflected_direction
 
 class Photon:
     def __init__(self, position, direction, stokes,energy):
@@ -76,39 +76,44 @@ class Photon:
         #calculate ca2
         r, ca2 = RFresnel(set_parameters.get_material("n"),set_parameters.get_material("n1"),ca1)
 
-#        position= photon.position_hit_boundary
-#        direction = photon.direction
-#        radius = get_material('r')
-#        ca1,normal=compute_ca1(position,direction,radius)
-#        n=get_material('n')
-#        n1=get_material('n1')
-#        r,ca2=RFresnel(n,n1,ca1)
-
         #decide whether photon is reflected
         if np.random.rand() <= r:
-            # Photon is reflected
-            from gc_ar.computations import compute_reflected_direction
+
             self.direction = compute_reflected_direction(self.direction, normal_vector, set_parameters.get_material("n"), set_parameters.get_material("n1"))
 
-            print("----------look at me!-------------")
-            return True  # Photon stays inside sphere
-        else:
-            # Photon is transmitted (only if ca2 is not None)
-            if ca2 is not None:
-                self.direction = compute_transmitted_direction(self.direction, normal_vector, set_parameters.get_material("n"), set_parameters.get_material("n1"), ca2, ca1)
-                print ("I'm turning this way: ", self.direction)
-                print ("The dot plot is giving this answer: ", np.dot(self.direction, self.position))
+            print ("I got reflected, ", self.direction)
 
-                # If P · D < 0: The direction points inward (toward the center)
-                if np.dot(self.direction,self.position) <0:
-                    return True
+            # decide whether the new direction points inwards
+            # If P · D < 0: The direction points inward (toward the center)
+            if np.dot(self.direction, self.position) < 0:
 
-                # If P · D > 0: The direction points outward (away from the center)
-                # If P · D = 0: The direction is tangential to the sphere
-                else:
-                    return False
+                print ("my reflection was inwards")
+
+                return True
+
+            # If P · D > 0: The direction points outward (away from the center)
+            # If P · D = 0: The direction is tangential to the sphere
             else:
-                # Total internal reflection case - should not happen since r=1.0
-                from gc_ar.computations import compute_reflected_direction
-                self.direction = compute_reflected_direction(self.direction, normal_vector, set_parameters.get_material("n"), set_parameters.get_material("n1"))
+
+                print ("my reflection was outwards")
+
                 return False
+
+        else:
+            #in this branch photon is transmitted.
+
+            print ("I'm transmitted")
+
+            return False
+
+            # # Photon is transmitted (only if ca2 is not None)
+            # if ca2 is not None:
+            #     self.direction = compute_transmitted_direction(self.direction, normal_vector, set_parameters.get_material("n"), set_parameters.get_material("n1"), ca2, ca1)
+            #     print ("I'm turning this way: ", self.direction)
+            #     print ("The dot plot is giving this answer: ", np.dot(self.direction, self.position))
+            #
+            # else:
+            #     # Total internal reflection case - should not happen since r=1.0
+            #     from gc_ar.computations import compute_reflected_direction
+            #     self.direction = compute_reflected_direction(self.direction, normal_vector, set_parameters.get_material("n"), set_parameters.get_material("n1"))
+            #     return False
