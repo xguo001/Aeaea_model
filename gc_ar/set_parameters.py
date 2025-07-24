@@ -27,7 +27,7 @@ parameters = {
         "energy_threshold": 1e-4, #threshold energy level for photon to leave
 
         #simulation paramters
-        "n_photons": 100,
+        "n_photons": 10,
 
 }
 

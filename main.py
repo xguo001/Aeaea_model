@@ -4,7 +4,7 @@ from gc_ar.plots import plot_variable_vs_angle
 from gc_ar.multiple_photons import simulate_multiple_photon
 import numpy as np
 import gc_ar.results as results
-from gc_ar.plots import plot_energy_distribution
+from gc_ar.plots import plot_energy_distribution, plot_photon_paths
 from gc_ar.monitors import absorption_monitor
 
 # -----------------------------
@@ -15,7 +15,7 @@ if __name__ == "__main__":
     #setting simulation parameters
     start= 0.5
     end= 3.5
-    loop= 7
+    loop= 1
     name="GC"
 
     def init_process(x):
@@ -32,10 +32,14 @@ if __name__ == "__main__":
         output = simulate_multiple_photon(set_parameters.get_material("n_photons"))
         results.conc_to_variable_vs_output(np.hstack(([x],output)))
 
-    print(results.return_absorption_matrix()[:, 0].sum())
-    print(np.sum(results.return_detected_energy()))
-    print(np.sum(results.return_out_of_bound_energy()))
 
     #Plot everything
+    #plot_variable_vs_angle(name)
+    detector = {
+        "cone_axis": np.array([0.0, 0, 1]),
+        "cone_center": np.pi / 8,
+        "r": 0.6
+    }
+    path=np.array(results.return_energy_matrix())
     plot_variable_vs_angle(name)
-
+    plot_photon_paths([path],detector,sphere_radius=0.6)

@@ -11,11 +11,18 @@ results = {
     "detected_energy": np.empty((0,1)),
     "out_of_bound_energy": np.empty((0, 1)),
 
+    #energy matrix
+    'energy_matrix': np.empty((0, 4)),
+
     #Sweeped variable vs. output matrix
     #variable, np.mean(results), np.mean(step_counters), np.mean(path_lengths_collector), death_counters
     "variable_vs_output": np.empty((0, 5)),
 
 }
+
+def conc_to_energy_matrix(energy_m):
+    #takes energy level, x, y, z and concatenante into the results
+    results['energy_matrix'] = np.vstack([results['energy_matrix'], energy_m])
 
 def conc_to_absorption_matrix(energy_position):
     #takes energy level, x, y, z and concatenante into the results
@@ -39,6 +46,9 @@ def conc_to_variable_vs_output(one_row):
 
 def return_absorption_matrix():
     return results["absorption_matrix"]
+
+def return_energy_matrix():
+    return results["energy_matrix"]
 
 def return_detected_energy():
     return results["detected_energy"]
