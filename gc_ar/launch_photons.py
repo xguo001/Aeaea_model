@@ -16,3 +16,5 @@ def launch_a_photon(beam_radius,angle,z):
     return p
 
 
+
+

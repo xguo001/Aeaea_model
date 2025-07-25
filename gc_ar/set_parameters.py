@@ -29,6 +29,10 @@ parameters = {
         #simulation paramters
         "n_photons": 10,
 
+        #input signal paramters
+        "pulse_peak_time": 0.5,
+        "pulse_width": 1e-9
+
 }
 
 # -----------------------------
