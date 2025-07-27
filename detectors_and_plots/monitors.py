@@ -14,7 +14,6 @@ def absorption_monitor(position,width,length,height,absorbed_energy_matrix):
     z_br = z + height / 2
 
     for absorption_event in absorbed_energy_matrix:
-        #print("is this a number?"+str(absorption_event))
         if x_bl <= absorption_event[1] <= x_br:
             if y_bl <= absorption_event[2] <= y_br:
                 if z_bl <= absorption_event[3] <= z_br:

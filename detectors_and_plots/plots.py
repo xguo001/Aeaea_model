@@ -4,6 +4,7 @@ import initialize.results as results
 import initialize.set_parameters as set_parameters
 from matplotlib import cm
 from matplotlib.colors import Normalize
+from photon_journey.computations import return_total_absoprtions
 
 def plot_energy_distribution(absorption_points):
     """Plots a 3D scatter of photon energy deposition"""
@@ -51,16 +52,14 @@ def plot_variable_vs_angle(name):
     right_column = param_text[mid_point:]
     
     # Calculate energy values
-    total_absorbed = results.return_absorption_matrix()[:, 0].sum()
-    total_detected = np.sum(results.return_detected_energy())
-    total_out_of_bound = np.sum(results.return_out_of_bound_energy())
-    
+    total_absorption = return_total_absoprtions()
+
     # Create energy summary text
     energy_text = [
         "-------------------",
-        f"total absorbed energy: {total_absorbed:.2f}",
-        f"total detected energy: {total_detected:.2f}",
-        f"total out of bound energy: {total_out_of_bound:.2f}"
+        f"total absorbed energy: {total_absorption[0]:.2f}",
+        f"total detected energy: {total_absorption[1]:.2f}",
+        f"total out of bound energy: {total_absorption[2]:.2f}"
     ]
     
     # Add whitespace below the plot and place parameters text outside plot area

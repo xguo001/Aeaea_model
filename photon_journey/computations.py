@@ -1,4 +1,5 @@
 import initialize.set_parameters as set_parameters
+import initialize.results as results
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -216,30 +217,30 @@ def compute_reflected_direction(d_in, normal,n1,n2):
     # Partial reflection — always reflect (ignore transmission)
     d_reflected = d_in - 2 * np.dot(d_in, normal) * normal
 
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-
-    origin = np.array([0, 0, 0])
-    scale = 1.0
-
-    # Plot incoming ray
-    ax.quiver(*origin, *d_in, color='blue', length=scale, label='Incoming')
-    # Plot normal
-    ax.quiver(*origin, *normal, color='green', length=scale, linestyle='dotted', label='Surface Normal')
-    # Plot reflected ray
-    ax.quiver(*origin, *d_reflected, color='red', length=scale, label='Reflected')
-
-    ax.set_xlim([-scale, scale])
-    ax.set_ylim([-scale, scale])
-    ax.set_zlim([-scale, scale])
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
-    ax.set_zlabel('Z')
-    ax.set_title("Photon Reflection Visualization")
-    ax.legend()
-    plt.tight_layout()
-    plt.show()
+    #
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111, projection='3d')
+    #
+    # origin = np.array([0, 0, 0])
+    # scale = 1.0
+    #
+    # # Plot incoming ray
+    # ax.quiver(*origin, *d_in, color='blue', length=scale, label='Incoming')
+    # # Plot normal
+    # ax.quiver(*origin, *normal, color='green', length=scale, linestyle='dotted', label='Surface Normal')
+    # # Plot reflected ray
+    # ax.quiver(*origin, *d_reflected, color='red', length=scale, label='Reflected')
+    #
+    # ax.set_xlim([-scale, scale])
+    # ax.set_ylim([-scale, scale])
+    # ax.set_zlim([-scale, scale])
+    # ax.set_xlabel('X')
+    # ax.set_ylabel('Y')
+    # ax.set_zlabel('Z')
+    # ax.set_title("Photon Reflection Visualization")
+    # ax.legend()
+    # plt.tight_layout()
+    # plt.show()
 
 
 
@@ -320,3 +321,11 @@ def mu_a_circular_dichroism(stokes):
     circularity = V / I
     mu_at = mu_0 + delta_mu * circularity
     return mu_at
+
+def return_total_absoprtions():
+    # Calculate energy values
+    total_absorbed = results.return_absorption_matrix()[:, 0].sum()
+    total_detected = results.return_absorption_matrix()[:, 0].sum()
+    total_out_of_bound = results.return_out_of_bound_energy()[:, 0].sum()
+
+    return (np.array([total_absorbed,total_detected,total_out_of_bound]))

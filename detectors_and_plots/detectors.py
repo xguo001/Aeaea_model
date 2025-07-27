@@ -94,7 +94,6 @@ def reflection_transmission(photon):
             direction_new = compute_transmitted_direction(direction, normal ,n, n1, ca2,ca1)
             photon.direction = direction_new
             photon.stokes = M_T @ photon.stokes
-            print("this photon is transmitted")
             return photon
 
     else:

@@ -14,6 +14,7 @@ parameters = {
         "n1": 1,
         "alpha": 52.7, #degree per decimeter per g/ml
         "GC": 2, # g/ml
+        "light_speed": 300000000, #m/s speed of light through the medium
 
         #detector parameters
         # A detector is defined by an angle and the r

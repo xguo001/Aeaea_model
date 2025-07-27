@@ -1,5 +1,6 @@
 import numpy as np
 import initialize.set_parameters as set_parameters
+import initialize.results as results
 from photon_journey.computations import rotation_matrix_glucose, change_direction, compute_phi, mie_scattering_matrix_rayleigh, rotation_matrix_phi, compute_ca1, \
     RFresnel,mu_a_circular_dichroism, compute_reflected_direction
 
@@ -14,9 +15,19 @@ class Photon:
         self.total_step_count = 0.0
         self.died_detected = False
         self.alive = True
+        self.time_alive = 0.0
+
+    def update_time_alive(self, added_distance):
+        #take distance traveled and calculate time spent traveling
+        #also add to global time as each photon travels (sequentially)
+        self.time_alive += added_distance / set_parameters.get_material("light_speed")
+        results.update_global_time(added_distance / set_parameters.get_material("light_speed"))
 
     def update_position(self, step_size):
+        #In the single photon code, step_size could be + or - when we cut path at boundary
+        #We will update time every time we update position.
         self.position += step_size * self.direction
+        self.update_time_alive(step_size)
 
     def update_position_without_step(self, new_position):
         self.position = new_position
