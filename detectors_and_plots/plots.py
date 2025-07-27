@@ -1,8 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import gc_ar.results as results
-import gc_ar.set_parameters as set_parameters
-from mpl_toolkits.mplot3d import Axes3D
+import initialize.results as results
+import initialize.set_parameters as set_parameters
 from matplotlib import cm
 from matplotlib.colors import Normalize
 
@@ -30,7 +29,7 @@ def plot_energy_distribution(absorption_points):
 
 def plot_variable_vs_angle(name):
     #variable, np.mean(angular rotation), np.mean(step_counters), np.mean(path_lengths_collector), death_counters
-    plt.plot(results.return_variable_vs_output()[:,0],results.return_variable_vs_output()[:,1],"-o")
+    plt.plot(results.return_variable_vs_output()[:, 0], results.return_variable_vs_output()[:, 1], "-o")
     plt.ylabel("angles")
     plt.xlabel(name + " vs. angles")
     

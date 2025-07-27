@@ -1,9 +1,7 @@
-import gc_ar.set_parameters as set_parameters
-import gc_ar.photon as photon
-from gc_ar.single_photon import simulate_one_photon
-from gc_ar.computations import rotation_angle_calculation
+import initialize.set_parameters as set_parameters
+from photon_journey.single_photon import simulate_one_photon
+from photon_journey.computations import rotation_angle_calculation
 import numpy as np
-import os,time
 
 
 # -----------------------------

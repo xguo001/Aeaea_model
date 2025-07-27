@@ -1,4 +1,4 @@
-import gc_ar.set_parameters as set_parameters
+import initialize.set_parameters as set_parameters
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -70,7 +70,7 @@ def mie_scattering_matrix_rayleigh(theta_s):
 # TAKE THE TOTAL PATH LENGTH FROM A PHOTON'S JOURNEY AND RETURN THE ROTATION ANGLE (EQ.1 OF CHICKEN FINGER PAPER)
 # -----------------------------
 def rotation_angle_calculation(GC,total_path_length):
-    angle=GC*(total_path_length/10)*set_parameters.get_material("alpha") #degree
+    angle= GC * (total_path_length/10) * set_parameters.get_material("alpha") #degree
     return angle
 
 def mid_point(position_0,position_1):
@@ -310,8 +310,8 @@ def mu_a_circular_dichroism(stokes):
     Returns:
         mu_a: float — effective absorption coefficient adjusted for polarization
     """
-    mu_0=set_parameters.get_material("mu_a")
-    delta_mu=set_parameters.get_material("dmu_a")
+    mu_0= set_parameters.get_material("mu_a")
+    delta_mu= set_parameters.get_material("dmu_a")
     I, Q, U, V = stokes
 
     if I <= 0:

@@ -1,9 +1,3 @@
-import gc_ar.set_parameters as set_parameters
-from gc_ar.single_photon import simulate_one_photon
-from gc_ar.computations import rotation_angle_calculation
-import numpy as np
-import matplotlib.pyplot as plt
-
 def absorption_monitor(position,width,length,height,absorbed_energy_matrix):
     #take the matrix of absorbed energy over the space (in an array of [e,x,y,z])
     #and sum total energy over the monitored space (given by cube center, w,l,h)

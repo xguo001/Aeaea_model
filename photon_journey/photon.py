@@ -1,6 +1,7 @@
 import numpy as np
-import gc_ar.set_parameters as set_parameters
-from gc_ar.computations import rotation_matrix_glucose, change_direction, compute_phi, mie_scattering_matrix_rayleigh, rotation_matrix_phi, compute_ca1, compute_transmitted_direction, RFresnel,mu_a_circular_dichroism, compute_reflected_direction
+import initialize.set_parameters as set_parameters
+from photon_journey.computations import rotation_matrix_glucose, change_direction, compute_phi, mie_scattering_matrix_rayleigh, rotation_matrix_phi, compute_ca1, \
+    RFresnel,mu_a_circular_dichroism, compute_reflected_direction
 
 class Photon:
     def __init__(self, position, direction, stokes,energy):
@@ -71,10 +72,10 @@ class Photon:
         # The position vector P points from the origin (center) to the point on the sphere, so it always points radially outward. The dot product measures how much your direction vector D aligns with this outward radial direction. A positive dot product means they point in similar directions (outward), while a negative dot product means they point in opposite directions (inward).
 
         #calculate ca1
-        ca1, normal_vector = compute_ca1(self.position, self.direction,set_parameters.get_material("r"))
+        ca1, normal_vector = compute_ca1(self.position, self.direction, set_parameters.get_material("r"))
 
         #calculate ca2
-        r, ca2 = RFresnel(set_parameters.get_material("n"),set_parameters.get_material("n1"),ca1)
+        r, ca2 = RFresnel(set_parameters.get_material("n"), set_parameters.get_material("n1"), ca1)
 
         #decide whether photon is reflected
         if np.random.rand() <= r:
@@ -114,6 +115,6 @@ class Photon:
             #
             # else:
             #     # Total internal reflection case - should not happen since r=1.0
-            #     from gc_ar.computations import compute_reflected_direction
+            #     from photon_journey.computations import compute_reflected_direction
             #     self.direction = compute_reflected_direction(self.direction, normal_vector, set_parameters.get_material("n"), set_parameters.get_material("n1"))
             #     return False
