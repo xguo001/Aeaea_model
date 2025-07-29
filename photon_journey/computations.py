@@ -322,10 +322,3 @@ def mu_a_circular_dichroism(stokes):
     mu_at = mu_0 + delta_mu * circularity
     return mu_at
 
-def return_total_absoprtions():
-    # Calculate energy values
-    total_absorbed = results.return_absorption_matrix()[:, 0].sum()
-    total_detected = results.return_absorption_matrix()[:, 0].sum()
-    total_out_of_bound = results.return_out_of_bound_energy()[:, 0].sum()
-
-    return (np.array([total_absorbed,total_detected,total_out_of_bound]))

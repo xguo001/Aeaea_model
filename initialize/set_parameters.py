@@ -18,7 +18,6 @@ parameters = {
 
         #detector parameters
         # A detector is defined by an angle and the r
-
         "cone_axis": np.array([0.0, 0.0, 1]),
         "cone_center": np.pi / 8,
         "r": 0.6,
@@ -27,9 +26,11 @@ parameters = {
         "chance": 0.1, #implementing p12. of energy conservation paper
         "energy_threshold": 1e-4, #threshold energy level for photon to leave
 
-        #simulation paramters
-        "n_photons": 10,
+        #simulation parameters
+        "n_photons": 1000,
 
+        #plotting parameters
+        "bins_width_for_time": 1e-6, #used to determine the size of the bins in the absorbed energy vs time graph
 }
 
 # -----------------------------

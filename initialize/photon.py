@@ -93,13 +93,13 @@ class Photon:
 
             self.direction = compute_reflected_direction(self.direction, normal_vector, set_parameters.get_material("n"), set_parameters.get_material("n1"))
 
-            print ("I got reflected, ", self.direction)
+            #print ("I got reflected, ", self.direction)
 
             # decide whether the new direction points inwards
             # If P · D < 0: The direction points inward (toward the center)
             if np.dot(self.direction, self.position) < 0:
 
-                print ("my reflection was inwards")
+                #print ("my reflection was inwards")
 
                 return True
 
@@ -107,14 +107,14 @@ class Photon:
             # If P · D = 0: The direction is tangential to the sphere
             else:
 
-                print ("my reflection was outwards")
+                #print ("my reflection was outwards")
 
                 return False
 
         else:
             #in this branch photon is transmitted.
 
-            print ("I'm transmitted")
+            #print ("I'm transmitted")
 
             return False
 

@@ -1,9 +1,8 @@
 import initialize.set_parameters as set_parameters
-from detectors_and_plots.plots import plot_variable_vs_angle
-from photon_journey.multiple_photons import simulate_multiple_photon
+from photon_journey.photon_journey import simulate_multiple_photon
 import numpy as np
 import initialize.results as results
-from detectors_and_plots.plots import plot_photon_paths
+from detectors_and_plots.plots import plot_variable_vs_angle, plot_absorbed_energy_vs_time
 
 # -----------------------------
 # RUN SIMULATION BASED ON NUMBER OF PHOTONS AND GLUCOSE LEVEL INPUTS, WRITE OUT TO A GRAPH
@@ -13,7 +12,7 @@ if __name__ == "__main__":
     #setting simulation parameters
     start= 0.5
     end= 3.5
-    loop= 1
+    loop= 7
     name="GC"
 
     def init_process(x):
@@ -40,5 +39,7 @@ if __name__ == "__main__":
     }
     path=np.array(results.return_energy_matrix())
     plot_variable_vs_angle(name)
+    plot_absorbed_energy_vs_time(set_parameters.get_material("bins_width_for_time"))
+
 #    plot_photon_paths([path],detector,sphere_radius=0.6)
 
