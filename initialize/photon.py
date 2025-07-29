@@ -1,6 +1,8 @@
 import numpy as np
-import gc_ar.set_parameters as set_parameters
-from gc_ar.computations import rotation_matrix_glucose, change_direction, compute_phi, mie_scattering_matrix_rayleigh, rotation_matrix_phi, compute_ca1, compute_transmitted_direction, RFresnel,mu_a_circular_dichroism, compute_reflected_direction
+import initialize.set_parameters as set_parameters
+import initialize.results as results
+from photon_journey.computations import rotation_matrix_glucose, change_direction, compute_phi, mie_scattering_matrix_rayleigh, rotation_matrix_phi, compute_ca1, \
+    RFresnel,mu_a_circular_dichroism, compute_reflected_direction
 
 class Photon:
     def __init__(self, position, direction, stokes,energy):
@@ -13,9 +15,19 @@ class Photon:
         self.total_step_count = 0.0
         self.died_detected = False
         self.alive = True
+        self.time_alive = 0.0
+
+    def update_time_alive(self, added_distance):
+        #take distance traveled and calculate time spent traveling
+        #also add to global time as each photon travels (sequentially)
+        self.time_alive += added_distance / set_parameters.get_material("light_speed")
+        results.update_global_time(added_distance / set_parameters.get_material("light_speed"))
 
     def update_position(self, step_size):
+        #In the single photon code, step_size could be + or - when we cut path at boundary
+        #We will update time every time we update position.
         self.position += step_size * self.direction
+        self.update_time_alive(step_size)
 
     def update_position_without_step(self, new_position):
         self.position = new_position
@@ -71,23 +83,23 @@ class Photon:
         # The position vector P points from the origin (center) to the point on the sphere, so it always points radially outward. The dot product measures how much your direction vector D aligns with this outward radial direction. A positive dot product means they point in similar directions (outward), while a negative dot product means they point in opposite directions (inward).
 
         #calculate ca1
-        ca1, normal_vector = compute_ca1(self.position, self.direction,set_parameters.get_material("r"))
+        ca1, normal_vector = compute_ca1(self.position, self.direction, set_parameters.get_material("r"))
 
         #calculate ca2
-        r, ca2 = RFresnel(set_parameters.get_material("n"),set_parameters.get_material("n1"),ca1)
+        r, ca2 = RFresnel(set_parameters.get_material("n"), set_parameters.get_material("n1"), ca1)
 
         #decide whether photon is reflected
         if np.random.rand() <= r:
 
             self.direction = compute_reflected_direction(self.direction, normal_vector, set_parameters.get_material("n"), set_parameters.get_material("n1"))
 
-            print ("I got reflected, ", self.direction)
+            #print ("I got reflected, ", self.direction)
 
             # decide whether the new direction points inwards
             # If P · D < 0: The direction points inward (toward the center)
             if np.dot(self.direction, self.position) < 0:
 
-                print ("my reflection was inwards")
+                #print ("my reflection was inwards")
 
                 return True
 
@@ -95,14 +107,14 @@ class Photon:
             # If P · D = 0: The direction is tangential to the sphere
             else:
 
-                print ("my reflection was outwards")
+                #print ("my reflection was outwards")
 
                 return False
 
         else:
             #in this branch photon is transmitted.
 
-            print ("I'm transmitted")
+            #print ("I'm transmitted")
 
             return False
 
@@ -114,6 +126,6 @@ class Photon:
             #
             # else:
             #     # Total internal reflection case - should not happen since r=1.0
-            #     from gc_ar.computations import compute_reflected_direction
+            #     from photon_journey.computations import compute_reflected_direction
             #     self.direction = compute_reflected_direction(self.direction, normal_vector, set_parameters.get_material("n"), set_parameters.get_material("n1"))
             #     return False

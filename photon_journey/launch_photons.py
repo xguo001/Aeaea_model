@@ -1,6 +1,5 @@
 import numpy as np
-from gc_ar.set_parameters import initialize_photon
-from gc_ar.photon import Photon
+from initialize.photon import Photon
 def launch_a_photon(beam_radius,angle,z):
     #default to luanching photons into x-y plane at position z with an angle
     #stokes is defined as 1,1,0,0

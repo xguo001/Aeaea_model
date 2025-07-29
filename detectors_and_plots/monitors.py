@@ -1,8 +1,6 @@
-import gc_ar.set_parameters as set_parameters
-from gc_ar.single_photon import simulate_one_photon
-from gc_ar.computations import rotation_angle_calculation
+import initialize.results as results
 import numpy as np
-import matplotlib.pyplot as plt
+
 
 def absorption_monitor(position,width,length,height,absorbed_energy_matrix):
     #take the matrix of absorbed energy over the space (in an array of [e,x,y,z])
@@ -20,7 +18,6 @@ def absorption_monitor(position,width,length,height,absorbed_energy_matrix):
     z_br = z + height / 2
 
     for absorption_event in absorbed_energy_matrix:
-        #print("is this a number?"+str(absorption_event))
         if x_bl <= absorption_event[1] <= x_br:
             if y_bl <= absorption_event[2] <= y_br:
                 if z_bl <= absorption_event[3] <= z_br:
@@ -28,5 +25,11 @@ def absorption_monitor(position,width,length,height,absorbed_energy_matrix):
 
     return total_energy
 
+def return_total_absoprtions():
+    # Calculate energy values
+    total_absorbed = results.return_absorption_matrix()[:, 0].sum()
+    total_detected = results.return_absorption_matrix()[:, 0].sum()
+    total_out_of_bound = results.return_out_of_bound_energy()[:, 0].sum()
 
+    return (np.array([total_absorbed,total_detected,total_out_of_bound]))
 

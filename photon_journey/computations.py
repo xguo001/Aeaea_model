@@ -1,4 +1,5 @@
-import gc_ar.set_parameters as set_parameters
+import initialize.set_parameters as set_parameters
+import initialize.results as results
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -70,7 +71,7 @@ def mie_scattering_matrix_rayleigh(theta_s):
 # TAKE THE TOTAL PATH LENGTH FROM A PHOTON'S JOURNEY AND RETURN THE ROTATION ANGLE (EQ.1 OF CHICKEN FINGER PAPER)
 # -----------------------------
 def rotation_angle_calculation(GC,total_path_length):
-    angle=GC*(total_path_length/10)*set_parameters.get_material("alpha") #degree
+    angle= GC * (total_path_length/10) * set_parameters.get_material("alpha") #degree
     return angle
 
 def mid_point(position_0,position_1):
@@ -216,30 +217,30 @@ def compute_reflected_direction(d_in, normal,n1,n2):
     # Partial reflection — always reflect (ignore transmission)
     d_reflected = d_in - 2 * np.dot(d_in, normal) * normal
 
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-
-    origin = np.array([0, 0, 0])
-    scale = 1.0
-
-    # Plot incoming ray
-    ax.quiver(*origin, *d_in, color='blue', length=scale, label='Incoming')
-    # Plot normal
-    ax.quiver(*origin, *normal, color='green', length=scale, linestyle='dotted', label='Surface Normal')
-    # Plot reflected ray
-    ax.quiver(*origin, *d_reflected, color='red', length=scale, label='Reflected')
-
-    ax.set_xlim([-scale, scale])
-    ax.set_ylim([-scale, scale])
-    ax.set_zlim([-scale, scale])
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
-    ax.set_zlabel('Z')
-    ax.set_title("Photon Reflection Visualization")
-    ax.legend()
-    plt.tight_layout()
-    plt.show()
+    #
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111, projection='3d')
+    #
+    # origin = np.array([0, 0, 0])
+    # scale = 1.0
+    #
+    # # Plot incoming ray
+    # ax.quiver(*origin, *d_in, color='blue', length=scale, label='Incoming')
+    # # Plot normal
+    # ax.quiver(*origin, *normal, color='green', length=scale, linestyle='dotted', label='Surface Normal')
+    # # Plot reflected ray
+    # ax.quiver(*origin, *d_reflected, color='red', length=scale, label='Reflected')
+    #
+    # ax.set_xlim([-scale, scale])
+    # ax.set_ylim([-scale, scale])
+    # ax.set_zlim([-scale, scale])
+    # ax.set_xlabel('X')
+    # ax.set_ylabel('Y')
+    # ax.set_zlabel('Z')
+    # ax.set_title("Photon Reflection Visualization")
+    # ax.legend()
+    # plt.tight_layout()
+    # plt.show()
 
 
 
@@ -310,8 +311,8 @@ def mu_a_circular_dichroism(stokes):
     Returns:
         mu_a: float — effective absorption coefficient adjusted for polarization
     """
-    mu_0=set_parameters.get_material("mu_a")
-    delta_mu=set_parameters.get_material("dmu_a")
+    mu_0= set_parameters.get_material("mu_a")
+    delta_mu= set_parameters.get_material("dmu_a")
     I, Q, U, V = stokes
 
     if I <= 0:
@@ -320,3 +321,4 @@ def mu_a_circular_dichroism(stokes):
     circularity = V / I
     mu_at = mu_0 + delta_mu * circularity
     return mu_at
+

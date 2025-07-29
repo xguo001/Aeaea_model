@@ -1,10 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import gc_ar.results as results
-import gc_ar.set_parameters as set_parameters
-from mpl_toolkits.mplot3d import Axes3D
+import initialize.results as results
+import initialize.set_parameters as set_parameters
 from matplotlib import cm
 from matplotlib.colors import Normalize
+from detectors_and_plots.monitors import return_total_absoprtions
+import initialize.results as results
 
 def plot_energy_distribution(absorption_points):
     """Plots a 3D scatter of photon energy deposition"""
@@ -28,9 +29,11 @@ def plot_energy_distribution(absorption_points):
     plt.tight_layout()
     plt.show()
 
+
+
 def plot_variable_vs_angle(name):
     #variable, np.mean(angular rotation), np.mean(step_counters), np.mean(path_lengths_collector), death_counters
-    plt.plot(results.return_variable_vs_output()[:,0],results.return_variable_vs_output()[:,1],"-o")
+    plt.plot(results.return_variable_vs_output()[:, 0], results.return_variable_vs_output()[:, 1], "-o")
     plt.ylabel("angles")
     plt.xlabel(name + " vs. angles")
     
@@ -52,16 +55,14 @@ def plot_variable_vs_angle(name):
     right_column = param_text[mid_point:]
     
     # Calculate energy values
-    total_absorbed = results.return_absorption_matrix()[:, 0].sum()
-    total_detected = np.sum(results.return_detected_energy())
-    total_out_of_bound = np.sum(results.return_out_of_bound_energy())
-    
+    total_absorption = return_total_absoprtions()
+
     # Create energy summary text
     energy_text = [
         "-------------------",
-        f"total absorbed energy: {total_absorbed:.2f}",
-        f"total detected energy: {total_detected:.2f}",
-        f"total out of bound energy: {total_out_of_bound:.2f}"
+        f"total absorbed energy: {total_absorption[0]:.2f}",
+        f"total detected energy: {total_absorption[1]:.2f}",
+        f"total out of bound energy: {total_absorption[2]:.2f}"
     ]
     
     # Add whitespace below the plot and place parameters text outside plot area
@@ -166,3 +167,35 @@ def plot_photon_paths(photon_paths, detector=None, sphere_radius=None):
     ax.set_xlim(-limit, limit)
     ax.set_ylim(-limit, limit)
     ax.set_zlim(-limit, limit)
+
+def plot_absorbed_energy_vs_time(bin_width):
+    """Plots absorbed energy vs time using absorption matrix data with binning"""
+    absorption_data = results.return_absorption_matrix()
+    
+    if len(absorption_data) == 0:
+        return
+    
+    energies = absorption_data[:, 0]  # First column: energy
+    times = absorption_data[:, 4]     # Last column: global_time
+    
+    # Create time bins based on bin_width
+    time_min, time_max = np.min(times), np.max(times)
+    n_bins = int(np.ceil((time_max - time_min) / bin_width))
+    bin_edges = np.linspace(time_min, time_min + n_bins * bin_width, n_bins + 1)
+    bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+    
+    # Bin the data and sum energies in each bin
+    binned_energies = np.zeros(n_bins)
+    for i in range(len(times)):
+        bin_idx = np.searchsorted(bin_edges[1:], times[i])
+        if bin_idx < n_bins:
+            binned_energies[bin_idx] += energies[i]
+    
+    plt.figure()
+    plt.plot(bin_centers, binned_energies, 'o-', markersize=4, linewidth=1)
+    plt.xlabel('Time')
+    plt.ylabel('Absorbed Energy (Binned)')
+    plt.title('Absorbed Energy vs Time (Binned)')
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.show()
