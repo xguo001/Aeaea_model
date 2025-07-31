@@ -14,7 +14,10 @@ from photon_journey.launch_photons import launch_a_photon
 def simulate_one_photon():
 
     # Initialize variables
-    this_photon= launch_a_photon(beam_radius=0.2,angle=0,z=0)
+    launch_time = np.random.normal(loc=5.5e-5, scale=1.5e-5)
+    launch_time = np.clip(launch_time, 1e-5, 1e-4)
+
+    this_photon= launch_a_photon(beam_radius=0.2,angle=0,z=0,launch_time=launch_time)
     mu_t = set_parameters.get_material("mu_s") + set_parameters.get_material("mu_a")
 
     while this_photon.alive:
@@ -46,7 +49,7 @@ def simulate_one_photon():
             if this_photon.energy == 0:
                 this_photon.alive = False
                 #concatenante to results the energy level and midpoint of the travel
-                results.conc_to_absorption_matrix(np.hstack(([energy_0 - this_photon.energy], mid_point(pos_start, this_photon.position))))
+                results.conc_to_absorption_matrix(np.hstack(([energy_0 - this_photon.energy], mid_point(pos_start, this_photon.position), this_photon.time_alive)))
                 #We have to break the while loop, so we don't have to check energy == 0 in later branches
                 return this_photon
 
@@ -69,10 +72,10 @@ def simulate_one_photon():
             this_photon.update_position_hit_detector(pos_start,t_value)
 
             #scale energy and deposit energy at path midpoint
-            results.conc_to_absorption_matrix(np.hstack(([(energy_0 - this_photon.energy) * t_value], mid_point(pos_start, this_photon.position_hit_detector))))
+            results.conc_to_absorption_matrix(np.hstack(([(energy_0 - this_photon.energy) * t_value], mid_point(pos_start, this_photon.position_hit_detector), this_photon.time_alive)))
 
             #deposit remaining energy to the detector
-            results.conc_to_detected_energy(energy_0 - (energy_0 - this_photon.energy) * t_value)
+            results.conc_to_detected_energy(np.hstack((energy_0 - (energy_0 - this_photon.energy) * t_value, this_photon.time_alive)))
 
             # Rotate Angle and Polarize due to Glucose
             this_photon.update_stokes_through_glucose_medium(t_value * s)
@@ -96,7 +99,7 @@ def simulate_one_photon():
             this_photon.update_position_hit_boundary(pos_start,t_value)
 
             #Scale energy and deposit at midpoint between start point and where boundary is
-            results.conc_to_absorption_matrix(np.hstack(([(energy_0 - this_photon.energy) * t_value], mid_point(pos_start, this_photon.position))))
+            results.conc_to_absorption_matrix(np.hstack(([(energy_0 - this_photon.energy) * t_value], mid_point(pos_start, this_photon.position),this_photon.time_alive)))
             #results.conc_to_energy_matrix(np.hstack(([this_photon.energy], this_photon.position)))
             reflected = this_photon.reflection_transmission()
 
@@ -113,13 +116,13 @@ def simulate_one_photon():
                 #if not reflected, then deposit remaining energy and this photon's journey ends
                 #Deposit remainder of energy onto the boundary (the energy for the journey to the boundary has already been deposited)
                 this_photon.alive = False
-                results.conc_to_out_of_bound_energy(energy_0 - (energy_0 - this_photon.energy) * t_value)
+                results.conc_to_out_of_bound_energy(np.hstack([energy_0 - (energy_0 - this_photon.energy) * t_value, this_photon.time_alive]))
 
         #Branch 4: keep traveling
         if not detected_photon and not hit_boundary:
 
             # Deposit energy
-            results.conc_to_absorption_matrix(np.hstack(([energy_0 - this_photon.energy], mid_point(pos_start, this_photon.position))))
+            results.conc_to_absorption_matrix(np.hstack(([energy_0 - this_photon.energy], mid_point(pos_start, this_photon.position), this_photon.time_alive)))
 
             # Rotate Angle and Polarize due to Glucose
             this_photon.update_stokes_through_glucose_medium(s)
