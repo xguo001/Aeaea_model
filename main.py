@@ -39,7 +39,7 @@ if __name__ == "__main__":
     }
     path=np.array(results.return_energy_matrix())
     plot_variable_vs_angle(name)
-    plot_absorbed_energy_vs_time(set_parameters.get_material("bins_width_for_time"))
+    plot_absorbed_energy_vs_time(set_parameters.get_material("n_bins"))
 
 #    plot_photon_paths([path],detector,sphere_radius=0.6)
 

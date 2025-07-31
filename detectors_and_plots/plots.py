@@ -168,8 +168,8 @@ def plot_photon_paths(photon_paths, detector=None, sphere_radius=None):
     ax.set_ylim(-limit, limit)
     ax.set_zlim(-limit, limit)
 
-def plot_absorbed_energy_vs_time(bin_width):
-    """Plots absorbed energy vs time using absorption matrix data with binning"""
+def plot_absorbed_energy_vs_time(n_bins):
+    """Plots absorbed energy vs time using absorption matrix data with equal-sized bins"""
     absorption_data = results.return_absorption_matrix()
     
     if len(absorption_data) == 0:
@@ -178,24 +178,41 @@ def plot_absorbed_energy_vs_time(bin_width):
     energies = absorption_data[:, 0]  # First column: energy
     times = absorption_data[:, 4]     # Last column: global_time
     
-    # Create time bins based on bin_width
-    time_min, time_max = np.min(times), np.max(times)
-    n_bins = int(np.ceil((time_max - time_min) / bin_width))
-    bin_edges = np.linspace(time_min, time_min + n_bins * bin_width, n_bins + 1)
-    bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+    # Sort data by time to create equal-sized bins
+    # Time should already be sorted -- this is written by Claude lol
+    sorted_indices = np.argsort(times)
+    sorted_times = times[sorted_indices]
+    sorted_energies = energies[sorted_indices]
     
-    # Bin the data and sum energies in each bin
-    binned_energies = np.zeros(n_bins)
-    for i in range(len(times)):
-        bin_idx = np.searchsorted(bin_edges[1:], times[i])
-        if bin_idx < n_bins:
-            binned_energies[bin_idx] += energies[i]
+    # Calculate points per bin
+    n_points = len(sorted_times)
+    points_per_bin = n_points // n_bins
+    
+    # Create bins with equal number of points
+    bin_centers = []
+    binned_energies = []
+    
+    for i in range(n_bins):
+        start_idx = i * points_per_bin
+        if i == n_bins - 1:  # Last bin gets remaining points
+            end_idx = n_points
+        else:
+            end_idx = (i + 1) * points_per_bin
+        
+        # Calculate bin center as median time in this bin
+        bin_times = sorted_times[start_idx:end_idx]
+        bin_center = np.median(bin_times)
+        bin_centers.append(bin_center)
+        
+        # Sum energies in this bin
+        bin_energy = np.sum(sorted_energies[start_idx:end_idx])
+        binned_energies.append(bin_energy)
     
     plt.figure()
     plt.plot(bin_centers, binned_energies, 'o-', markersize=4, linewidth=1)
     plt.xlabel('Time')
-    plt.ylabel('Absorbed Energy (Binned)')
-    plt.title('Absorbed Energy vs Time (Binned)')
+    plt.ylabel('Absorbed Energy (Equal-sized bins)')
+    plt.title('Absorbed Energy vs Time (Equal-sized bins)')
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
     plt.show()
