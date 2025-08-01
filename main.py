@@ -12,7 +12,7 @@ if __name__ == "__main__":
     #setting simulation parameters
     start= 0.5
     end= 3.5
-    loop= 7
+    loop= 1
     name="GC"
 
     def init_process(x):

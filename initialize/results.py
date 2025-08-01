@@ -20,29 +20,27 @@ results = {
     "variable_vs_output": np.empty((0, 5)),
 
     #Global time
-    "global_time": 0.0,
+    "global_latest_time": 0.0,
 
 }
 
-def update_global_time(added_time):
-    results['global_time'] += added_time
+def update_global_time(new_time):
+    if results['global_latest_time'] < new_time:
+        results['global_latest_time'] = new_time
 
 def conc_to_energy_matrix(energy_m):
     #takes energy level, x, y, z and concatenante into the results
     results['energy_matrix'] = np.vstack([results['energy_matrix'], energy_m])
 
-def conc_to_absorption_matrix(energy_position):
-    #takes energy level, x, y, z and concatenante into the results
-    new_row = np.array([energy_position[0], energy_position[1], energy_position[2], energy_position[3],results['global_time']])
-    results["absorption_matrix"] = np.vstack([results["absorption_matrix"], new_row])
+def conc_to_absorption_matrix(energy_position_time):
+    #takes energy level, x, y, z, time and concatenante into the results
+    results['absorption_matrix'] = np.vstack([results['absorption_matrix'], energy_position_time])
 
-def conc_to_detected_energy(energy):
-    new_row = np.array([energy, results['global_time']])
-    results["detected_energy"] = np.vstack([results["detected_energy"], new_row])
+def conc_to_detected_energy(energy_time):
+    results["detected_energy"] = np.vstack([results["detected_energy"], energy_time])
 
-def conc_to_out_of_bound_energy(energy):
-    new_row = np.array([energy, results['global_time']])
-    results["out_of_bound_energy"] = np.vstack([results["out_of_bound_energy"], new_row])
+def conc_to_out_of_bound_energy(energy_time):
+    results["out_of_bound_energy"] = np.vstack([results["out_of_bound_energy"], energy_time])
 
 def conc_to_variable_vs_output(one_row):
     #takes [0] variable being sweeped, [1] average rotation angles, [2] average path length [3] total number of death
