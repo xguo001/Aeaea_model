@@ -1,11 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import initialize.results as results
 import initialize.set_parameters as set_parameters
 from matplotlib import cm
 from matplotlib.colors import Normalize
 from detectors_and_plots.monitors import return_total_absoprtions
 import initialize.results as results
+from matplotlib.backends.backend_pdf import PdfPages
+
 
 def plot_energy_distribution(absorption_points):
     """Plots a 3D scatter of photon energy deposition"""
@@ -31,7 +32,7 @@ def plot_energy_distribution(absorption_points):
 
 
 
-def plot_variable_vs_angle(name):
+def plot_variable_vs_angle(pdf_pages = None , name = None):
     #variable, np.mean(angular rotation), np.mean(step_counters), np.mean(path_lengths_collector), death_counters
     plt.plot(results.return_variable_vs_output()[:, 0], results.return_variable_vs_output()[:, 1], "-o")
     plt.ylabel("angles")
@@ -70,7 +71,10 @@ def plot_variable_vs_angle(name):
     plt.figtext(0.1, 0.01, '\n'.join(left_column + energy_text), fontsize=10, verticalalignment='bottom')
     plt.figtext(0.5, 0.01, '\n'.join(right_column), fontsize=10, verticalalignment='bottom')
     
-    plt.show()
+    # Save to PDF if pdf_pages object is provided
+    if pdf_pages is not None:
+        pdf_pages.savefig()  # Save current figure to PDF
+        plt.close()
 
 def spherical_to_cartesian(r, theta, phi=0):
     x = r * np.sin(theta) * np.cos(phi)
@@ -168,10 +172,14 @@ def plot_photon_paths(photon_paths, detector=None, sphere_radius=None):
     ax.set_ylim(-limit, limit)
     ax.set_zlim(-limit, limit)
 
-def plot_absorbed_energy_vs_time(n_bins):
+def plot_absorbed_energy_vs_time(pdf_pages=None, plot_number=1):
     """Plots absorbed energy vs time using absorption matrix data with equal-sized bins"""
+
     absorption_data = results.return_absorption_matrix()
-    
+    n_bins = set_parameters.get_material("n_bins")
+    x_axis_left = set_parameters.get_material("absorbed_energy_time_begin")
+    x_axis_right = set_parameters.get_material("absorbed_energy_time_end")
+
     if len(absorption_data) == 0:
         return
     
@@ -211,8 +219,14 @@ def plot_absorbed_energy_vs_time(n_bins):
     plt.figure()
     plt.plot(bin_centers, binned_energies, 'o-', markersize=4, linewidth=1)
     plt.xlabel('Time')
-    plt.ylabel('Absorbed Energy (Equal-sized bins)')
-    plt.title('Absorbed Energy vs Time (Equal-sized bins)')
+    plt.ylabel('Absorbed Energy')
+    plt.title(f'Absorbed Energy vs Time {plot_number}')
     plt.grid(True, alpha=0.3)
+    plt.xlim(x_axis_left, x_axis_right)  # Set x-axis limits
     plt.tight_layout()
-    plt.show()
+
+
+    # Save to PDF if pdf_pages object is provided
+    if pdf_pages is not None:
+        pdf_pages.savefig()  # Save current figure to PDF
+        plt.close()
