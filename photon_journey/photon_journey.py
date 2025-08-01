@@ -14,10 +14,10 @@ from photon_journey.launch_photons import launch_a_photon
 def simulate_one_photon():
 
     # Initialize variables
-    launch_time = np.random.normal(loc=5.5e-5, scale=1.5e-5)
-    launch_time = np.clip(launch_time, 1e-5, 1e-4)
-
-    this_photon= launch_a_photon(beam_radius=0.2,angle=0,z=0,launch_time=launch_time)
+    #launch_time = np.random.normal(loc=5.5e-5, scale=1.5e-5)
+    #launch_time = np.clip(launch_time, 1e-5, 1e-4)
+    launch_time=0
+    this_photon= launch_a_photon(beam_radius=0.2,angle=0,z=0,launch_time=launch_time,pulse=True)
     mu_t = set_parameters.get_material("mu_s") + set_parameters.get_material("mu_a")
 
     while this_photon.alive:
