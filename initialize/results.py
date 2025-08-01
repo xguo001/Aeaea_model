@@ -20,7 +20,7 @@ results = {
     "variable_vs_output": np.empty((0, 5)),
 
     #Global time
-    "global_time": 0.0,
+    "global_time": 0,
 
 }
 

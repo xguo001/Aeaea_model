@@ -5,7 +5,7 @@ from photon_journey.computations import rotation_matrix_glucose, change_directio
     RFresnel,mu_a_circular_dichroism, compute_reflected_direction
 
 class Photon:
-    def __init__(self, position, direction, stokes,energy):
+    def __init__(self, position, direction, stokes,energy,time_alive):
         self.position = position
         self.position_hit_detector = [0,0,0]
         self.direction = direction
@@ -15,7 +15,7 @@ class Photon:
         self.total_step_count = 0.0
         self.died_detected = False
         self.alive = True
-        self.time_alive = 0.0
+        self.time_alive = time_alive
 
     def update_time_alive(self, added_distance):
         #take distance traveled and calculate time spent traveling
@@ -28,6 +28,8 @@ class Photon:
         #We will update time every time we update position.
         self.position += step_size * self.direction
         self.update_time_alive(step_size)
+        print("---------------Now the time is "+str(self.time_alive))
+        print("---------------Now the global time is"+str(results.return_global_time()))
 
     def update_position_without_step(self, new_position):
         self.position = new_position

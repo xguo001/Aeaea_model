@@ -14,7 +14,7 @@ from photon_journey.launch_photons import launch_a_photon
 def simulate_one_photon():
 
     # Initialize variables
-    this_photon= launch_a_photon(beam_radius=0.2,angle=0,z=0)
+    this_photon= launch_a_photon(beam_radius=0.2,angle=0,z=0,pulse=True)
     mu_t = set_parameters.get_material("mu_s") + set_parameters.get_material("mu_a")
 
     while this_photon.alive:

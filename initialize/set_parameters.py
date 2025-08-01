@@ -28,9 +28,13 @@ parameters = {
 
         #simulation parameters
         "n_photons": 1000,
+        "pulse_width": 1e-5,
+        "pulse_peak_time": 1e-5,
+
+
 
         #plotting parameters
-        "bins_width_for_time": 1e-6, #used to determine the size of the bins in the absorbed energy vs time graph
+        "n_bins": 20, #used to determine the size of the bins in the absorbed energy vs time graph
 }
 
 # -----------------------------
