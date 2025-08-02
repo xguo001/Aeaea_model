@@ -33,6 +33,8 @@ parameters = {
 
         #plotting parameters
         "n_bins": 20, #used to determine the size of the bins in the absorbed energy vs time graph
+        "absorbed_energy_time_begin": 1e-5 - 1e-7,
+        "absorbed_energy_time_end": 1e-5 + 1e-7,
 }
 
 # -----------------------------
